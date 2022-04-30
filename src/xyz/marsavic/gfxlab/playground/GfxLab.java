@@ -6,10 +6,7 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.gfxlab.graphics3d.cameras.Perspective;
 import xyz.marsavic.gfxlab.graphics3d.cameras.TransformedCamera;
 import xyz.marsavic.gfxlab.graphics3d.raytracers.PathTracer;
-import xyz.marsavic.gfxlab.graphics3d.scenes.MirrorRoom;
-import xyz.marsavic.gfxlab.graphics3d.scenes.Oranges;
-import xyz.marsavic.gfxlab.graphics3d.scenes.TestCSG;
-import xyz.marsavic.gfxlab.graphics3d.scenes.TestGI;
+import xyz.marsavic.gfxlab.graphics3d.scenes.*;
 import xyz.marsavic.gfxlab.tonemapping.ColorTransformForColorMatrix;
 import xyz.marsavic.gfxlab.tonemapping.ToneMappingFunctionSimple;
 import xyz.marsavic.objectinstruments.annotations.GadgetDouble;
@@ -57,7 +54,8 @@ public class GfxLab {
 //				new Oranges(3);
 //				new TestTransformed(phiX, phiY, phiZ);
 //				new TestCSG(t);
-				new TestGI();
+//				new TestGI();
+				new TestGICylinder();
 				
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),
