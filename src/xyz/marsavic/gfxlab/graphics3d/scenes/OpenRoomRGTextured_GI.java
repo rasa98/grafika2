@@ -15,6 +15,7 @@ public class OpenRoomRGTextured_GI extends Scene.Base {
 		Texture tL = Grid.standard(Color.hsb(0.0/3, 0.5, 0.5));
 		Texture tR = Grid.standard(Color.hsb(1.0/3, 0.5, 0.5));
 		Texture tW = Grid.standard(Color.gray(0.5));
+		Texture tS = Grid.standard(Color.hsb(0.76, 0.84, 0.96));
 		Texture tU = Grid.standard(Color.hsb(0.5, 0.94, 0.86));
 		
 		
@@ -23,7 +24,7 @@ public class OpenRoomRGTextured_GI extends Scene.Base {
 				Body.textured(HalfSpace.pn(Vec3.xyz(-1,  0,  0), Vec3.xyz( 1,  0,  0)), tR),
 				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  1,  0), Vec3.xyz( 0, -1,  0)), tU),
 				Body.textured(HalfSpace.pn(Vec3.xyz( 0, -1,  0), Vec3.xyz( 0,  1,  0)), tW),
-				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  0,  1), Vec3.xyz( 0,  0, -1)), tW)
+				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  0,  1), Vec3.xyz( 0,  0, -1)), tS)
 		);
 		
 		Collections.addAll(lights,

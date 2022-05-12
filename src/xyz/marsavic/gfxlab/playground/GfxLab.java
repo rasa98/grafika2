@@ -13,6 +13,7 @@ import xyz.marsavic.objectinstruments.annotations.GadgetDouble;
 import xyz.marsavic.objectinstruments.annotations.GadgetDoubleExponential;
 
 
+
 public class GfxLab {
 	
 	Scene scene;
@@ -45,6 +46,13 @@ public class GfxLab {
 	
 	@GadgetDouble(p = -1, q = 1)
 	public double y = 0;
+
+	@GadgetDouble(p = -1, q = 1)
+	public double rotX = 0;
+	@GadgetDouble(p = -1, q = 1)
+	public double rotY = 0;
+	@GadgetDouble(p = -1, q = 1)
+	public double rotZ = 0;
 	
 	synchronized void setup() {
 		scene =
@@ -56,8 +64,9 @@ public class GfxLab {
 //				new TestCSG(t);
 //				new TestGI();
 //				new TestGICylinder();
-				new TestGICylinderCone();
-				
+//				new TestGICylinderCone();
+				new TestGITorus(rotX, rotY, rotZ);
+
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),
 				Affine.IDENTITY
