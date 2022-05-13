@@ -63,9 +63,10 @@ public class GfxLab {
 //				new TestTransformed(phiX, phiY, phiZ);
 //				new TestCSG(t);
 //				new TestGI();
-//				new TestGICylinder();
+//				new TestGICylinder(0, 10);
 //				new TestGICylinderCone();
-				new TestGITorus(rotX, rotY, rotZ);
+//				new TestGITorus(rotX, rotY, rotZ);
+				new TestGIMotionBlur(0.03, 3);
 
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),

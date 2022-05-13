@@ -9,7 +9,6 @@ import java.util.Collections;
 
 
 public class TestGITorus extends Scene.Base {
-
 	public TestGITorus(double rotX, double rotY, double rotZ) {
 		addAllFrom(new OpenRoomRGTextured_GI());
 		
@@ -24,5 +23,4 @@ public class TestGITorus extends Scene.Base {
 
 		);
 	}
-	
 }

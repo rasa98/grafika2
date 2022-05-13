@@ -71,7 +71,7 @@ public class Cone implements Solid {
 		Vec3 uppVec = Vec3.EZX.mul(c()).add(Vec3.EY.mul(height));;
 		Vec3 norm = Vec3.EY.mul(-1);
 		HalfSpace plane = HalfSpace.pn(uppVec, norm);
-		HalfSpace.HitHalfSpace hit = plane.firstHit(ray, 0);
+		HalfSpace.HitHalfSpace hit = (HalfSpace.HitHalfSpace) plane.firstHit(ray, 0);
 		if(hit != null){
 			Vec3 p = ray.at(hit.t());
 			Vec3 v = p.sub(uppVec);
@@ -83,7 +83,7 @@ public class Cone implements Solid {
 	}
 	
 	@Override
-	public HitCone firstHit(Ray ray, double afterTime) {
+	public HitCone firstHit(Ray ray, double tt, double afterTime) {
 		if(lower > ray.p().y()){
 			HitCone hit = hitLid(lower, ray);
 			if(hit != null)

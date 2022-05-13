@@ -12,13 +12,17 @@ public interface Scene {
 	Collection<Body> bodies();
 	Collection<Light> lights();
 	Color backgroundColor();
-	
+
+	double getT(double x);
 	
 	
 	public static class Base implements Scene {
 		protected List<Body> bodies = new ArrayList<>();
 		protected List<Light> lights = new ArrayList<>();
 		protected Color backgroundColor = Color.BLACK;
+
+		protected double t1;
+		protected double t2;
 		
 		
 		@Override
@@ -35,8 +39,13 @@ public interface Scene {
 		public Color backgroundColor() {
 			return backgroundColor;
 		}
-		
-		
+
+		@Override
+		public double getT(double x) {
+			return t1 + x * (t2 - t1);
+		}
+
+
 		public void addBodiesFrom(Scene other) {
 			bodies.addAll(other.bodies());
 		}

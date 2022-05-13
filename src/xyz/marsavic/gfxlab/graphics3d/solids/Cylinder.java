@@ -1,6 +1,8 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
+import xyz.marsavic.functions.interfaces.Function1;
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.Affine;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
@@ -17,28 +19,41 @@ public class Cylinder implements Solid {
 
 	private final double lower;
 
+	private Function1<Affine, Double> f1;// = t -> Affine.IDENTITY;
+
 	// transient
 	private final double rSqr;
 
 
-	private Cylinder(Vec3 c, double r, double h) {
+	private Cylinder(Vec3 c, double r, double h, Function1<Affine, Double> f1) {
 		this.c = c;
 		this.r = r;
 		this.h2 = h / 2;
 		upper = c.y() + h2;
 		lower = c.y() - h2;
 		rSqr = r * r;
+		this.f1 = f1;
 	}
 
 
 	public static Cylinder crh(Vec3 c, double r, double h){
-		return new Cylinder(c, r, h);
+		return new Cylinder(c, r, h, null);
+	}
+
+	public static Cylinder crh(Vec3 c, double r, double h, Function1<Affine, Double> f1) {
+		return new Cylinder(c, r, h, f1);
 	}
 	
 	
 	public Vec3 c() {
 		return c;
 	}
+
+	/*public Vec3 c(double t) {
+		if(f1 == null)
+			return c();
+		return f1.at(t).applyTo(c());
+	}*/
 	
 	
 	public double r() {
@@ -50,7 +65,7 @@ public class Cylinder implements Solid {
 		Vec3 uppVec = Vec3.EZX.mul(c()).add(Vec3.EY.mul(height));
 		Vec3 norm = upper == height? Vec3.EY: Vec3.EY.mul(-1);
 		HalfSpace plane = HalfSpace.pn(uppVec, norm);
-		HalfSpace.HitHalfSpace hit = plane.firstHit(ray, 0);
+		HalfSpace.HitHalfSpace hit = (HalfSpace.HitHalfSpace) plane.firstHit(ray, 0);
 		if(hit != null){
 			Vec3 p = ray.at(hit.t());
 			Vec3 v = p.sub(uppVec);
@@ -62,7 +77,7 @@ public class Cylinder implements Solid {
 	}
 	
 	@Override
-	public HitCyl firstHit(Ray ray, double afterTime) {
+	public HitCyl firstHit(Ray ray, double t, double afterTime) {
 		if(upper < ray.p().y()){
 			HitCyl hit = hitLid(upper, ray);
 			if(hit != null)
@@ -73,7 +88,7 @@ public class Cylinder implements Solid {
 				return hit;
 		}
 
-		Vec3 c = this.c.mul(Vec3.EZX);
+		Vec3 c = c().mul(Vec3.EZX);
 		Vec3 p = ray.p().mul(Vec3.EZX);
 		Vec3 d = ray.d().mul(Vec3.EZX);
 

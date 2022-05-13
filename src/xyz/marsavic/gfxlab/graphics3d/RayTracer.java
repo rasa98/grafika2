@@ -31,12 +31,16 @@ public abstract class RayTracer implements ColorSamplerT {
 	}
 	
 	
-	protected abstract Color sample(Ray ray);
+	protected Color sample(Ray ray) {
+		return sample(ray, 0);
+	}
+
+	protected abstract Color sample(Ray ray, double t);
 	
 	
 	@Override
 	public Color sample(double t, Vector p) {
-		return sample(camera.sampleExitingRay(p));
+		return sample(camera.sampleExitingRay(p), scene().getT(t));
 	}
 	
 }

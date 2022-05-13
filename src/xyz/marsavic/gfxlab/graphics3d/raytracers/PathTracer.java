@@ -19,18 +19,18 @@ public class PathTracer extends RayTracerSimple {
 		super(scene, colliderFactory, camera);
 		this.maxDepth = maxDepth;
 	}
-	
-	
+
+
 	@Override
-	protected Color sample(Ray ray) {
-		return radiance(ray, maxDepth);
+	protected Color sample(Ray ray, double t) {
+		return radiance(ray, t, maxDepth);
 	}
+
 	
-	
-	private Color radiance(Ray ray, int depthRemaining) {
+	private Color radiance(Ray ray, double t, int depthRemaining) {
 		if (depthRemaining <= 0) return Color.BLACK;
 		
-		Collider.Collision collision = collider().collide(ray);
+		Collider.Collision collision = ((Collider.BruteForce) collider()).collide(ray, t);
 		
 		Body body = collision.body();
 		if (body == null) {
@@ -47,13 +47,13 @@ public class PathTracer extends RayTracerSimple {
 		if (bsdfResult.color().notZero()) {
 			Vec3 p = ray.at(collision.hit().t());                // Point of collision
 			Ray rayScattered = Ray.pd(p, bsdfResult.out());
-			Color rO = radiance(rayScattered, depthRemaining - 1);
+			Color rO = radiance(rayScattered, t, depthRemaining - 1);
 			Color rI = rO.mul(bsdfResult.color());
 			result = result.add(rI);
 		}
 		
 		return result;
 	}
-	
+
 	
 }

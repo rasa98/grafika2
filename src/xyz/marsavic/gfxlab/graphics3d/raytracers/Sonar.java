@@ -17,7 +17,7 @@ public class Sonar extends RayTracer {
 	
 	
 	@Override
-	protected Color sample(Ray ray) {
+	protected Color sample(Ray ray, double t) {
 		Collider.Collision collision = collider().collide(ray);
 		return collision == null ?
 				scene().backgroundColor() :

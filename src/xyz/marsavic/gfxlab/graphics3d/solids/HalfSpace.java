@@ -82,7 +82,7 @@ public class HalfSpace implements Solid {
 	
 	
 	@Override
-	public HitHalfSpace firstHit(Ray ray, double afterTime) {
+	public HitHalfSpace firstHit(Ray ray, double t1, double afterTime) {
 		double o = n().dot(ray.d());
 		
 		if (o == 0) {

@@ -36,7 +36,7 @@ public class Grid implements Texture {
 	public static Grid standard(Color color) {
 		return new Grid(
 				Vector.xy(0.25, 0.25),
-				Vector.xy(0.01, 0.01),
+				Vector.xy(0.05, 0.05),
 				Material.matte(color),
 				Material.matte(color.mul(0.75))
 		);

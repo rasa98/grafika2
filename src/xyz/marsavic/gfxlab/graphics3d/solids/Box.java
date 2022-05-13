@@ -1,8 +1,10 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 
+import xyz.marsavic.functions.interfaces.Function1;
 import xyz.marsavic.gfxlab.BoxedObjectFactory;
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.Affine;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
@@ -16,21 +18,43 @@ public class Box implements Solid {
 	
 	
 	private final Vec3 p, q;
-	
+
+	private Function1<Affine, Double> f1;
 	
 	private Box(Vec3 p, Vec3 q) {
 		this.p = p;
 		this.q = q;
 	}
-	
+
+	private Box(Vec3 p, Vec3 q, Function1<Affine, Double> f1) {
+		this.p = p;
+		this.q = q;
+		this.f1 = f1;
+	}
+
+	public static Box pq(Vec3 p, Vec3 q, Function1<Affine, Double> f1) {
+		return new Box(p, q, f1);
+	}
+
 
 	public Vec3 p() {
 		return p;
+	}
+	public Vec3 p(double t) {
+		if(f1 == null)
+			return c();
+		return f1.at(t).applyTo(p());
 	}
 
 	
 	public Vec3 q() {
 		return q;
+	}
+
+	public Vec3 q(double t) {
+		if(f1 == null)
+			return c();
+		return f1.at(t).applyTo(q());
 	}
 	
 	
@@ -47,12 +71,22 @@ public class Box implements Solid {
 	public Vec3 r() {
 		return d().div(2);
 	}
+
+
+	public Vec3 c(double t) {
+		return p(t).add(q(t)).div(2);
+	}
+
+
+	public Vec3 r(double t) {
+		return d().div(2);
+	}
 	
 	
 	@Override
-	public Hit firstHit(Ray ray, double afterTime) {
-		Vec3 tP = p().sub(ray.p()).div(ray.d());
-		Vec3 tQ = q().sub(ray.p()).div(ray.d());
+	public Hit firstHit(Ray ray, double t, double afterTime) {
+		Vec3 tP = p(t).sub(ray.p()).div(ray.d());
+		Vec3 tQ = q(t).sub(ray.p()).div(ray.d());
 		
 		Vec3 t0 = Vec3.min(tP, tQ);
 		Vec3 t1 = Vec3.max(tP, tQ);

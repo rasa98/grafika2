@@ -7,7 +7,11 @@ public interface Solid {
 	 * Returns the first hit of the ray into the surface of the solid, occurring after the given time.
 	 * If there is no hit, returns null.
 	 */
-	Hit firstHit(Ray ray, double afterTime);
+	default Hit firstHit(Ray ray, double afterTime) {
+		return firstHit(ray, 0 , afterTime);
+	}
+
+	Hit firstHit(Ray ray, double t, double afterTime);
 
 	
 	default Solid transformed(Affine t) {
@@ -16,9 +20,9 @@ public interface Solid {
 			private final Affine tInvTransposed = tInv.transposeWithoutTranslation();
 			
 			@Override
-			public Hit firstHit(Ray ray, double afterTime) {
+			public Hit firstHit(Ray ray, double t, double afterTime) {
 				Ray rayO = tInv.applyTo(ray);
-				Hit hitO = Solid.this.firstHit(rayO, afterTime);
+				Hit hitO = Solid.this.firstHit(rayO, t, afterTime);
 				if (hitO == null) {
 					return null;
 				}
@@ -31,7 +35,7 @@ public interface Solid {
 	public static Solid union(Solid... solids) {
 		return new Solid() {
 			@Override
-			public Hit firstHit(Ray ray, double afterTime) {
+			public Hit firstHit(Ray ray, double t1, double afterTime) {
 				int n = solids.length;
 				
 				boolean[] in = new boolean[n];
@@ -92,7 +96,7 @@ public interface Solid {
 	public static Solid intersection(Solid... solids) {
 		return new Solid() {
 			@Override
-			public Hit firstHit(Ray ray, double afterTime) {
+			public Hit firstHit(Ray ray, double t1, double afterTime) {
 				int n = solids.length;
 				
 				boolean[] in = new boolean[n];
@@ -152,7 +156,7 @@ public interface Solid {
 	public static Solid difference(Solid... solids) {
 		return new Solid() {
 			@Override
-			public Hit firstHit(Ray ray, double afterTime) {
+			public Hit firstHit(Ray ray, double t1, double afterTime) {
 				int n = solids.length;
 				
 				boolean[] in = new boolean[n];

@@ -14,7 +14,7 @@ public interface Collider {
 	Collision collide(Ray r);
 	
 	
-	default boolean collidesIn01(Ray r) {
+	default boolean collidesIn01(Ray r, double t) {
 		Collision collision = collide(r);
 		return (collision != null) && (collision.hit().t() < 1);
 	}
@@ -41,12 +41,17 @@ public interface Collider {
 		
 		@Override
 		public Collision collide(Ray r) {
+			return collide(r, 0);
+		}
+
+		
+		public Collision collide(Ray r, double t) {
 			Hit minHit = null;
 			double minHitT = Double.POSITIVE_INFINITY;
 			Body minBody = null;
 			
 			for (Body body : bodies) {
-				Hit hit = body.solid().firstHit(r, EPSILON);
+				Hit hit = body.solid().firstHit(r, t, EPSILON);
 				if ((hit != null) && (hit.t() < minHitT)) {
 					minHitT = hit.t();
 					minHit = hit;
@@ -59,9 +64,9 @@ public interface Collider {
 		
 		
 		@Override
-		public boolean collidesIn01(Ray r) {
+		public boolean collidesIn01(Ray r, double t) {
 			for (Body body : bodies) {
-				Hit hit = body.solid().firstHit(r, EPSILON);
+				Hit hit = body.solid().firstHit(r, t, EPSILON);
 				if ((hit != null) && (hit.t() < 1)) {
 					return true;
 				}

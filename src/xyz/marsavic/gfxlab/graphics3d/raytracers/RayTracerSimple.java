@@ -36,17 +36,17 @@ public class RayTracerSimple extends RayTracer {
 	
 	
 	@Override
-	protected Color sample(Ray ray) {
-		return sample(ray, maxDepth);
+	protected Color sample(Ray ray, double t) {
+		return sample(ray, t, maxDepth);
 	}
 	
 	
-	protected Color sample(Ray ray, int depthRemaining) {
+	protected Color sample(Ray ray, double t, int depthRemaining) {
 		if (depthRemaining == 0) {
 			return Color.BLACK;
 		}
 		
-		Collider.Collision collision = collider().collide(ray);
+		Collider.Collision collision = ((Collider.BruteForce) collider()).collide(ray, t);
 		
 		if (collision == null) {
 			return scene().backgroundColor();
@@ -68,7 +68,7 @@ public class RayTracerSimple extends RayTracer {
 		for (Light light : scene().lights()) {
 			Vec3 l = light.p().sub(p);              // Vector from p to the light;
 			
-			if (!(shadows && collider().collidesIn01(Ray.pd(p, l)))) {
+			if (!(shadows && collider().collidesIn01(Ray.pd(p, l), t))) {
 				double lLSqr = l.lengthSquared();   // Distance from p to the light squared
 				double lL = Math.sqrt(lLSqr);       // Distance from p to the light
 				double cosLN = n_.dot(l) / lL;      // Cosine of the angle between l and n_

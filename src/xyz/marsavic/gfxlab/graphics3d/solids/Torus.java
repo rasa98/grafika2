@@ -36,7 +36,7 @@ public class Torus implements Solid {
 
 
 	@Override
-	public HitTorus firstHit(Ray ray, double afterTime) {
+	public HitTorus firstHit(Ray ray, double t1, double afterTime) {
 		Vec3 d = ray.d();
 		double px = ray.p().x() - O.x(), dx = d.x();
 		double pz = ray.p().z() - O.z(), dz = d.z();
