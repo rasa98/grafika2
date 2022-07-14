@@ -66,8 +66,8 @@ public class GfxLab {
 //				new TestGICylinder();
 //				new TestGICylinderCone();
 //				new TestGITorus(rotX, rotY, rotZ);
-				new PyramidInRoom();
-
+//				new PyramidInRoom();
+				new teapotRoom();
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),
 				Affine.IDENTITY
