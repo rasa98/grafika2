@@ -19,7 +19,7 @@ public class Triangle implements Solid {
 	private final Vec3 n;
 
 
-	private Triangle(Vec3 p1, Vec3 p2, Vec3 p3) {
+	protected Triangle(Vec3 p1, Vec3 p2, Vec3 p3) {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
@@ -55,10 +55,14 @@ public class Triangle implements Solid {
 
 		// Strike
 		double t = f * e2.dot(origin_cross_e1);
+		return getHit(t, afterTime, ray, u, v);
+	}
+
+	protected HitTriangle getHit(double t, double afterTime, Ray ray, double u, double v) {
 		return t > afterTime? new HitTriangle(ray, t) : null;
 	}
-	
-	
+
+
 	class HitTriangle extends Hit.RayT {
 		
 		protected HitTriangle(Ray ray, double t) {
