@@ -1,6 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
@@ -81,7 +82,7 @@ public class Cone implements Solid {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public HitCone firstHit(Ray ray, double afterTime) {
 		if(lower > ray.p().y()){
@@ -145,8 +146,14 @@ public class Cone implements Solid {
 		return null;*/
 
 	}
-	
-	
+
+	@Override
+	public BoundingBox getBBox() {
+		Vec3 abc = Vec3.xyz(r, h2, r);
+		return new BoundingBox(c.sub(abc), c.add(abc));
+	}
+
+
 	class HitCone extends Hit.RayT {
 		private final Vec3 n;
 		protected HitCone(Ray ray, double t, Vec3 n) {

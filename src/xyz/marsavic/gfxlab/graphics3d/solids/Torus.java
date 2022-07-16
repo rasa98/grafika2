@@ -1,6 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
@@ -54,6 +55,12 @@ public class Torus implements Solid {
 		if (t != Double.MAX_VALUE)
 			return new HitTorus(ray, t);
 		return null;
+	}
+
+	@Override
+	public BoundingBox getBBox() {
+		Vec3 abc = Vec3.xyz(r+A, r, r+A);
+		return new BoundingBox(O.sub(abc), O.add(abc));
 	}
 
 	class HitTorus extends Hit.RayT {

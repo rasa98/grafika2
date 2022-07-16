@@ -12,6 +12,7 @@ import java.util.*;
 public class Parser {
     List<Vec3> vertices;
 
+//    Map<String, List<Vec3>> groupToVertexList;
     List<Vec3> vertNormals;
     Map<String, List<Triangle>> groups;
 
@@ -21,6 +22,7 @@ public class Parser {
         vertices = new ArrayList<>();
         vertNormals = new ArrayList<>();
         groups = new HashMap<>();
+//        groupToVertexList = new HashMap<>();
         parseObjFile(file);
     }
 

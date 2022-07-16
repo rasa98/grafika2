@@ -9,7 +9,9 @@ public interface Solid {
 	 */
 	Hit firstHit(Ray ray, double afterTime);
 
-	
+	// Returns bounding Box
+	BoundingBox getBBox();
+
 	default Solid transformed(Affine t) {
 		return new Solid() {
 			private final Affine tInv = t.inverse();
@@ -24,12 +26,37 @@ public interface Solid {
 				}
 				return hitO.withN(tInvTransposed.applyTo(hitO.n()));
 			}
+
+			@Override
+			public BoundingBox getBBox() {
+				//to do
+				return Solid.this.getBBox();
+			}
 		};
 	}
+
+	interface CsgSolid extends Solid {
+		Solid[] children();
+
+		@Override
+		default BoundingBox getBBox() {
+			// to do
+			BoundingBox bbox = new BoundingBox();
+			for( Solid c : children()){
+				bbox.addBBox(c.getBBox());
+			}
+
+			return bbox;
+		}
+	}
 	
-	
-	public static Solid union(Solid... solids) {
-		return new Solid() {
+	static Solid union(Solid... solids) {
+		return new CsgSolid() {
+			@Override
+			public Solid[] children() {
+				return solids;
+			}
+
 			@Override
 			public Hit firstHit(Ray ray, double afterTime) {
 				int n = solids.length;
@@ -89,8 +116,13 @@ public interface Solid {
 	}
 	
 	
-	public static Solid intersection(Solid... solids) {
-		return new Solid() {
+	static Solid intersection(Solid... solids) {
+		return new CsgSolid() {
+			@Override
+			public Solid[] children() {
+				return solids;
+			}
+
 			@Override
 			public Hit firstHit(Ray ray, double afterTime) {
 				int n = solids.length;
@@ -149,8 +181,12 @@ public interface Solid {
 		};
 	}
 	
-	public static Solid difference(Solid... solids) {
-		return new Solid() {
+	static Solid difference(Solid... solids) {
+		return new CsgSolid() {
+			@Override
+			public Solid[] children() {
+				return solids;
+			}
 			@Override
 			public Hit firstHit(Ray ray, double afterTime) {
 				int n = solids.length;

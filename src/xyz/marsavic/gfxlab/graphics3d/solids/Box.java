@@ -3,6 +3,7 @@ package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.BoxedObjectFactory;
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
@@ -70,7 +71,12 @@ public class Box implements Solid {
 		}
 		return null;
 	}
-	
+
+	@Override
+	public BoundingBox getBBox() {
+		return p.x() < q.x() ? new BoundingBox(p, q) : new BoundingBox(q, p);
+	}
+
 
 	static record HitBox(double t, Vec3 n_) implements Hit {
 		

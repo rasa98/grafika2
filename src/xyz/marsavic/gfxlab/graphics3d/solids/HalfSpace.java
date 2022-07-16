@@ -2,10 +2,7 @@ package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.geometry.Vector;
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.GeometryUtils;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
-import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
+import xyz.marsavic.gfxlab.graphics3d.*;
 
 
 public class HalfSpace implements Solid {
@@ -96,8 +93,16 @@ public class HalfSpace implements Solid {
 			}
 		}
 	}
-	
-	
+
+	@Override
+	public BoundingBox getBBox() {
+		// nzm dal je uredu....cisto da ima ..
+		//return new BoundingBox();
+		return new BoundingBox(Vec3.xyz(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE),
+							   Vec3.xyz(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
+	}
+
+
 	@Override
 	public String toString() {
 		return "HalfSpace{" +

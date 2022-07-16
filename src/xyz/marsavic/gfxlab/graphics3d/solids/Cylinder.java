@@ -1,6 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
@@ -102,8 +103,14 @@ public class Cylinder implements Solid {
 		return null;
 
 	}
-	
-	
+
+	@Override
+	public BoundingBox getBBox() {
+		Vec3 abc = Vec3.xyz(r, h2, r);
+		return new BoundingBox(c.sub(abc), c.add(abc));
+	}
+
+
 	class HitCyl extends Hit.RayT {
 		private final Vec3 n;
 		protected HitCyl(Ray ray, double t, Vec3 n) {

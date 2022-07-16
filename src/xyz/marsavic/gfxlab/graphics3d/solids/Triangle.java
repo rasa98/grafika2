@@ -1,14 +1,10 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
-import xyz.marsavic.geometry.Vector;
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
-import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
-import xyz.marsavic.utils.Numeric;
+import xyz.marsavic.gfxlab.graphics3d.*;
 
 
-public class Triangle implements Solid {
+public class Triangle extends SolidBBox {
 
 	private final double EPSILON = 1e-9;
 	private final Vec3 p1;
@@ -27,10 +23,15 @@ public class Triangle implements Solid {
 		e1 = p2.sub(p1);
 		e2 = p3.sub(p1);
 		n = e1.cross(e2);
+
+		this.bbox = getBBox();
 	}
 	
 	
-	public static Triangle p123(Vec3 p1, Vec3 p2, Vec3 p3) { return new Triangle(p1, p2, p3); }
+	public static Triangle p123(Vec3 p1, Vec3 p2, Vec3 p3) {
+
+		return new Triangle(p1, p2, p3);
+	}
 	
 	@Override
 	public HitTriangle firstHit(Ray ray, double afterTime) {
@@ -56,6 +57,15 @@ public class Triangle implements Solid {
 		// Strike
 		double t = f * e2.dot(origin_cross_e1);
 		return getHit(t, afterTime, ray, u, v);
+	}
+
+	@Override
+	public BoundingBox getBBox() {
+		BoundingBox bb = new BoundingBox();
+		bb = bb.addPoint(p1);
+		bb = bb.addPoint(p2);
+		bb = bb.addPoint(p3);
+		return bb;
 	}
 
 	protected HitTriangle getHit(double t, double afterTime, Ray ray, double u, double v) {
