@@ -10,7 +10,7 @@ public interface Solid {
 	Hit firstHit(Ray ray, double afterTime);
 
 	// Returns bounding Box
-	BoundingBox getBBox();
+//	BoundingBox getBBox();
 
 	default Solid transformed(Affine t) {
 		return new Solid() {
@@ -27,27 +27,27 @@ public interface Solid {
 				return hitO.withN(tInvTransposed.applyTo(hitO.n()));
 			}
 
-			@Override
-			public BoundingBox getBBox() {
-				//to do
-				return Solid.this.getBBox();
-			}
+//			@Override
+//			public BoundingBox getBBox() {
+//				//to do
+//				return Solid.this.getBBox();
+//			}
 		};
 	}
 
 	interface CsgSolid extends Solid {
 		Solid[] children();
 
-		@Override
-		default BoundingBox getBBox() {
-			// to do
-			BoundingBox bbox = new BoundingBox();
-			for( Solid c : children()){
-				bbox.addBBox(c.getBBox());
-			}
-
-			return bbox;
-		}
+//		@Override
+//		default BoundingBox getBBox() {
+//			// to do
+//			BoundingBox bbox = new BoundingBox();
+//			for( Solid c : children()){
+//				bbox.addBBox(c.getBBox());
+//			}
+//
+//			return bbox;
+//		}
 	}
 	
 	static Solid union(Solid... solids) {

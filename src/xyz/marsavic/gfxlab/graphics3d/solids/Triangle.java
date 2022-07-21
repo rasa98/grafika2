@@ -1,7 +1,10 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
+import com.google.common.collect.Lists;
 import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
+
+import java.util.List;
 
 
 public class Triangle extends SolidBBox {
@@ -24,7 +27,7 @@ public class Triangle extends SolidBBox {
 		e2 = p3.sub(p1);
 		n = e1.cross(e2);
 
-		this.bbox = getBBox();
+		setBBox(calculateBBox());
 	}
 	
 	
@@ -32,7 +35,10 @@ public class Triangle extends SolidBBox {
 
 		return new Triangle(p1, p2, p3);
 	}
-	
+
+	public List<Vec3> points(){
+		return Lists.newArrayList(new Vec3[]{p1, p2, p3});
+	}
 	@Override
 	public HitTriangle firstHit(Ray ray, double afterTime) {
 		Vec3 dir_cross_e2 = ray.d().cross(e2);
@@ -60,11 +66,17 @@ public class Triangle extends SolidBBox {
 	}
 
 	@Override
-	public BoundingBox getBBox() {
+	protected BoundingBox calculateBBox() {
 		BoundingBox bb = new BoundingBox();
+//		System.out.println();
+//		System.out.println("Triangle : "+ points());
+//		System.out.println("------bb (inside triangle)1: "+bb.box.p()+"  "+bb.box.q());
 		bb = bb.addPoint(p1);
+//		System.out.println("------bb (inside triangle)2: "+bb.box.p()+"  "+bb.box.q());
 		bb = bb.addPoint(p2);
+//		System.out.println("------bb (inside triangle)3: "+bb.box.p()+"  "+bb.box.q());
 		bb = bb.addPoint(p3);
+//		System.out.println("------bb (inside triangle)4: "+bb.box.p()+"  "+bb.box.q());
 		return bb;
 	}
 

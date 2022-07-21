@@ -31,12 +31,13 @@ public class PathTracer extends RayTracerSimple {
 		if (depthRemaining <= 0) return Color.BLACK;
 		
 		Collider.Collision collision = collider().collide(ray);
-		
-		Body body = collision.body();
-		if (body == null) {
+
+
+		if (collision == null) {
 			return scene().backgroundColor();
 		}
-		
+		Body body = collision.body();
+
 		Material material = body.materialAt(collision.hit());
 		Color result = material.emittance();
 		

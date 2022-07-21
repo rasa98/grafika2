@@ -5,7 +5,7 @@ import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
 
 
-public class HalfSpace implements Solid {
+public class HalfSpace extends SolidBBox {
 	
 	private final Vec3 p; // A point on the boundary plane
 	private final Vec3 e; // A vector parallel to the boundary plane.
@@ -95,11 +95,13 @@ public class HalfSpace implements Solid {
 	}
 
 	@Override
-	public BoundingBox getBBox() {
+	protected BoundingBox calculateBBox() {
 		// nzm dal je uredu....cisto da ima ..
 		//return new BoundingBox();
-		return new BoundingBox(Vec3.xyz(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE),
-							   Vec3.xyz(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
+
+//		return new BoundingBox(Vec3.xyz(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE),
+//				Vec3.xyz(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
+		throw new RuntimeException("class HalfSpace doesnt have BoundingBox");
 	}
 
 

@@ -1,9 +1,12 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
+import com.google.common.collect.Lists;
 import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
+
+import java.util.List;
 
 
 public class SmoothTriangle extends Triangle {
@@ -19,11 +22,14 @@ public class SmoothTriangle extends Triangle {
 		this.n1 = n1;
 		this.n2 = n2;
 		this.n3 = n3;
+
+		setBBox(calculateBBox());
 	}
 	
 	
 	public static SmoothTriangle p123(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n1, Vec3 n2, Vec3 n3) { return new SmoothTriangle(p1, p2, p3, n1, n2, n3); }
-	
+
+
 	@Override
 	protected HitTriangle getHit(double t, double afterTime, Ray ray, double u, double v) {
 		return t > afterTime? new HitSmoothTriangle(ray, t, u, v) : null;

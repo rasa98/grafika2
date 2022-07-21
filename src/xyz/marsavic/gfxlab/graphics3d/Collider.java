@@ -2,6 +2,7 @@ package xyz.marsavic.gfxlab.graphics3d;
 
 
 import java.util.Collection;
+import java.util.List;
 
 
 public interface Collider {
@@ -69,6 +70,55 @@ public interface Collider {
 			return false;
 		}
 		
+	}
+
+	public static class BvhCollider implements Collider {
+
+		private static final double EPSILON = 1e-9;
+
+		private final BVH root;
+
+
+		public BvhCollider(Collection<Body> bodies) {
+			this.root = BVH.makeBVH((List<Body>) bodies, 2);
+		}
+
+
+		@Override
+		public Collision collide(Ray r) {
+			Collision c = root.getCollision(r, EPSILON);
+			return root.getBestCollision(r, EPSILON, root.outliers, c);
+
+
+//			Hit minHit = null;
+//			double minHitT = Double.POSITIVE_INFINITY;
+//			Body minBody = null;
+//
+//			for (Body body : bodies) {
+//				Hit hit = body.solid().firstHit(r, EPSILON);
+//				if ((hit != null) && (hit.t() < minHitT)) {
+//					minHitT = hit.t();
+//					minHit = hit;
+//					minBody = body;
+//				}
+//			}
+//
+//			return minBody == null ? null : new Collision(minHit, minBody);
+		}
+
+
+		@Override
+		public boolean collidesIn01(Ray r) {
+			return root.getCollisionIn01(r, EPSILON);
+//			for (Body body : bodies) {
+//				Hit hit = body.solid().firstHit(r, EPSILON);
+//				if ((hit != null) && (hit.t() < 1)) {
+//					return true;
+//				}
+//			}
+//			return false;
+		}
+
 	}
 	
 }

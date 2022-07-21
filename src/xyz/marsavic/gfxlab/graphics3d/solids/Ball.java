@@ -2,14 +2,11 @@ package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.geometry.Vector;
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
-import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
+import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.utils.Numeric;
 
 
-public class Ball implements Solid {
+public class Ball extends SolidBBox {
 	
 	private final Vec3 c;
 	private final double r;
@@ -23,6 +20,8 @@ public class Ball implements Solid {
 		this.c = c;
 		this.r = r;
 		rSqr = r * r;
+
+		setBBox(calculateBBox());
 	}
 	
 	
@@ -58,7 +57,7 @@ public class Ball implements Solid {
 	}
 
 	@Override
-	public BoundingBox getBBox() {
+	public BoundingBox calculateBBox() {
 		Vec3 rVec = Vec3.ONES.mul(r);
 		return new BoundingBox(c.sub(rVec), c.add(rVec));
 	}

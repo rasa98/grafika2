@@ -1,13 +1,10 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
-import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
+import xyz.marsavic.gfxlab.graphics3d.*;
 
 
-public class Cone implements Solid {
+public class Cone extends SolidBBox {
 
 	private final Vec3 yEnd;
 	private final double r;
@@ -42,6 +39,8 @@ public class Cone implements Solid {
 		upper = c.y() + h2;
 		rSqr = r * r;
 		k = r / h;
+
+		setBBox(calculateBBox());
 	}
 
 
@@ -148,7 +147,7 @@ public class Cone implements Solid {
 	}
 
 	@Override
-	public BoundingBox getBBox() {
+	protected BoundingBox calculateBBox() {
 		Vec3 abc = Vec3.xyz(r, h2, r);
 		return new BoundingBox(c.sub(abc), c.add(abc));
 	}

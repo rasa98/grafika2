@@ -3,14 +3,11 @@ package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.BoxedObjectFactory;
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
-import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
+import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.utils.Numeric;
 
 
-public class Box implements Solid {
+public class Box extends SolidBBox {
 	
 	public static final BoxedObjectFactory.PQ<Box> $ = Box::new;
 	public static Box UNIT = Box.$.pq(Vec3.ZERO, Vec3.EXYZ);
@@ -19,9 +16,11 @@ public class Box implements Solid {
 	private final Vec3 p, q;
 	
 	
-	private Box(Vec3 p, Vec3 q) {
+	public Box(Vec3 p, Vec3 q) {
 		this.p = p;
 		this.q = q;
+
+		setBBox(calculateBBox());
 	}
 	
 
@@ -73,8 +72,9 @@ public class Box implements Solid {
 	}
 
 	@Override
-	public BoundingBox getBBox() {
-		return p.x() < q.x() ? new BoundingBox(p, q) : new BoundingBox(q, p);
+	protected BoundingBox calculateBBox() {
+		return p.x() <= q.x() ? new BoundingBox(this) : new BoundingBox(new Box(q, p));
+//		return new BoundingBox(this);
 	}
 
 

@@ -87,7 +87,8 @@ public class GfxLab {
 		
 		rayTracer = new PathTracer(
 				scene,
-				Collider.BruteForce::new,
+				Collider.BvhCollider::new,
+//				Collider.BruteForce::new,
 				camera,
 				maxDepth
 		);

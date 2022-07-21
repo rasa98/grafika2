@@ -1,16 +1,13 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.BoundingBox;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
-import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
+import xyz.marsavic.gfxlab.graphics3d.*;
 
 import org.apache.commons.math3.analysis.solvers.LaguerreSolver;
 import org.apache.commons.math3.complex.Complex;
 
 
-public class Torus implements Solid {
+public class Torus extends SolidBBox {
 
 	private final double A;
 	private final Vec3 O;
@@ -24,6 +21,8 @@ public class Torus implements Solid {
 		this.O = O;
 		this.A = A;
 		this.r = r;
+
+		setBBox(calculateBBox());
 	}
 
 
@@ -58,7 +57,7 @@ public class Torus implements Solid {
 	}
 
 	@Override
-	public BoundingBox getBBox() {
+	protected BoundingBox calculateBBox() {
 		Vec3 abc = Vec3.xyz(r+A, r, r+A);
 		return new BoundingBox(O.sub(abc), O.add(abc));
 	}
