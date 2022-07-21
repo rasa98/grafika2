@@ -26,9 +26,9 @@ public class Parser {
         parseObjFile(file);
     }
 
-    public static Collection<List<Triangle>> getTriMeshes(InputStream file){
+    public static Map<String, List<Triangle>> getTriMeshes(InputStream file){
         Parser p = new Parser(file);
-        return p.ParsedFileToGroups();
+        return p.groups;
     }
 
     private void addVert(double x, double y, double z){

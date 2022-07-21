@@ -18,7 +18,6 @@ public abstract class SolidBBox implements Solid{
     @Override
     public SolidBBox transformed(Affine t) {
         SolidBBox res = new SolidBBox() {
-
             private final Affine tInv = t.inverse();
             private final Affine tInvTransposed = tInv.transposeWithoutTranslation();
 
@@ -34,7 +33,8 @@ public abstract class SolidBBox implements Solid{
 
             @Override
             protected BoundingBox calculateBBox() {
-                BoundingBox bb = new BoundingBox();
+//                throw new RuntimeException();
+                BoundingBox bb = SolidBBox.this.bbox;
                 Vec3 p1 = bb.box.p();
                 Vec3 p2 = bb.box.q();
                 Vec3 p3 = Vec3.xyz(bb.box.p().x(), bb.box.p().y(), bb.box.q().z());
@@ -49,7 +49,8 @@ public abstract class SolidBBox implements Solid{
 //                return SolidBBox.this.getBBox();
             }
         };
-        res.bbox = calculateBBox();
+        res.bbox = res.calculateBBox();
+//        SolidBBox.this.bbox = cal
         return res;
     }
 

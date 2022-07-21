@@ -40,6 +40,11 @@ public class BVHSolid {
         this.right = right;
     }
 
+    private BVHSolid(BoundingBox bbox, List<SolidBBox> rightSolids) {
+        this(rightSolids);
+        this.bbox = bbox;
+    }
+
     public static BVHSolid makeBVH(List<SolidBBox> solids, int amount) {
         BVHSolid root = new BVHSolid(new ArrayList<SolidBBox>());
 //        Body[] b = bodies.toArray(new Body[0]);
@@ -58,6 +63,13 @@ public class BVHSolid {
         }
         root.bbox = localBBox;
         root.solids = solids;
+
+//        Stack<BVHSolid> s = new Stack<>();
+//        s.add(root);
+//        while(!s.isEmpty()){
+//            BVHSolid next = s.pop();
+//            divideBVH(next, amount, s);
+//        }
         divideBVH(root, amount);
         root.outliers = NoBBoxSolids;
         return root;
@@ -68,26 +80,100 @@ public class BVHSolid {
             return;
         }
         BoundingBox[] children = bvh.bbox.splitBox();
-        bvh.left = new BVHSolid(children[0]);
-        bvh.right = new BVHSolid(children[1]);
+
+        BoundingBox leftHalf = children[0];
+        BoundingBox rightHalf = children[1];
+        List<SolidBBox> leftSolids = new ArrayList<>();
+        List<SolidBBox> rightSolids = new ArrayList<>();
+        BoundingBox left = new BoundingBox();
+        BoundingBox right = new BoundingBox();
+//        bvh.left = new BVHSolid(children[0]);
+//        bvh.right = new BVHSolid(children[1]);
 
         for(int i = bvh.solids.size() - 1; i>=0; i--){
             SolidBBox s = bvh.solids.get(i);
-            BoundingBox.hasBBox e = bvh.left.bbox.hasBBox(s.getBBox());
+
+            BoundingBox.hasBBox e = leftHalf.hasBBox(s.getBBox());
+//            BoundingBox.hasBBox e = bvh.left.bbox.hasBBox(s.getBBox());
             switch (e){
                 case Full:
-                    bvh.left.solids.add(s);
-                    bvh.solids.remove(i);
+                    leftSolids.add(s);
+                    left = left.addBBox(s.getBBox());
+
                     break;
                 case None:
-                    bvh.right.solids.add(s);
-                    bvh.solids.remove(i);
+                    rightSolids.add(s);
+                    right = right.addBBox(s.getBBox());
                     break;
+                default:
+                    if(leftSolids.size() >= rightSolids.size()){
+                        rightSolids.add(s);
+                        right = right.addBBox(s.getBBox());
+                    }
+                    else{
+                        leftSolids.add(s);
+                        left = left.addBBox(s.getBBox());
+                    }
             }
+            bvh.solids.remove(i);
         }
+        bvh.left = new BVHSolid(left, leftSolids);
+        bvh.right = new BVHSolid(right, rightSolids);
+
         divideBVH(bvh.left, amount);
         divideBVH(bvh.right, amount);
     }
+//    private static void divideBVH(BVHSolid bvh, int amount, Stack<BVHSolid> stack) {
+//        if(bvh.solids.size() < amount){
+//            return;
+//        }
+//        BoundingBox[] children = bvh.bbox.splitBox();
+//
+//        BoundingBox leftHalf = children[0];
+//        BoundingBox rightHalf = children[1];
+//        List<SolidBBox> leftSolids = new ArrayList<>();
+//        List<SolidBBox> rightSolids = new ArrayList<>();
+//        BoundingBox left = new BoundingBox();
+//        BoundingBox right = new BoundingBox();
+////        bvh.left = new BVHSolid(children[0]);
+////        bvh.right = new BVHSolid(children[1]);
+//
+//        for(int i = bvh.solids.size() - 1; i>=0; i--){
+//            SolidBBox s = bvh.solids.get(i);
+//
+//            BoundingBox.hasBBox e = leftHalf.hasBBox(s.getBBox());
+////            BoundingBox.hasBBox e = bvh.left.bbox.hasBBox(s.getBBox());
+//            switch (e){
+//                case Full:
+//                    leftSolids.add(s);
+//                    left = left.addBBox(s.getBBox());
+//
+//                    break;
+//                case None:
+//                    rightSolids.add(s);
+//                    right = right.addBBox(s.getBBox());
+//                    break;
+//                default:
+//                    if(leftSolids.size() >= rightSolids.size()){
+//                        rightSolids.add(s);
+//                        right = right.addBBox(s.getBBox());
+//                    }
+//                    else{
+//                        leftSolids.add(s);
+//                        left = left.addBBox(s.getBBox());
+//                    }
+//            }
+//            bvh.solids.remove(i);
+//        }
+//        bvh.left = new BVHSolid(left, leftSolids);
+//        bvh.right = new BVHSolid(right, rightSolids);
+//        stack.add(bvh.left);
+//        stack.add(bvh.right);
+//
+//
+////        divideBVH(bvh.left, amount);
+////        divideBVH(bvh.right, amount);
+//    }
 
     public Hit getHit(Ray ray, double epsilon) {
         Hit minH = null;

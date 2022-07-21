@@ -27,6 +27,11 @@ public class BVH {
         this.bbox = bbox;
     }
 
+    private BVH(BoundingBox bbox, List<Body> l) {
+        this(l);
+        this.bbox = bbox;
+    }
+
     private BVH(BoundingBox bbox, BVH left, BVH right) {
         this();
         this.bbox = bbox;
@@ -72,24 +77,49 @@ public class BVH {
             return;
         }
         BoundingBox[] children = bvh.bbox.splitBox();
-        bvh.left = new BVH(children[0]);
-        bvh.right = new BVH(children[1]);
+
+        BoundingBox leftHalf = children[0];
+        BoundingBox rightHalf = children[1];
+        List<Body> leftBodies = new ArrayList<>();
+        List<Body> rightBodies = new ArrayList<>();
+        BoundingBox left = new BoundingBox();
+        BoundingBox right = new BoundingBox();
+//        bvh.left = new BVH(children[0]);
+//        bvh.right = new BVH(children[1]);
 
         for(int i=bvh.bodies.size() - 1; i>=0; i--){
             Body b = bvh.bodies.get(i);
             SolidBBox s = (SolidBBox) b.solid();
-            BoundingBox.hasBBox e = bvh.left.bbox.hasBBox(s.getBBox());
+
+            BoundingBox.hasBBox e = leftHalf.hasBBox(s.getBBox());
+//            BoundingBox.hasBBox e = bvh.left.bbox.hasBBox(s.getBBox());
+
             switch (e){
                 case Full:
-                    bvh.left.bodies.add(b);
-                    bvh.bodies.remove(i);
+                    leftBodies.add(b);
+                    left.addBBox(s.getBBox());
+
                 break;
                 case None:
-                    bvh.right.bodies.add(b);
-                    bvh.bodies.remove(i);
+                    rightBodies.add(b);
+                    right.addBBox(s.getBBox());
                 break;
+                default:
+                    if(leftBodies.size() >= rightBodies.size()){
+                        rightBodies.add(b);
+                        right.addBBox(s.getBBox());
+                    }
+                    else{
+                        leftBodies.add(b);
+                        left.addBBox(s.getBBox());
+                    }
             }
+            bvh.bodies.remove(i);
         }
+
+        bvh.left = new BVH(left, leftBodies);
+        bvh.right = new BVH(right, rightBodies);
+
         divideBVH(bvh.left, amount);
         divideBVH(bvh.right, amount);
     }

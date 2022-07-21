@@ -22,9 +22,9 @@ public class OpenRoomRGTextured_GI extends Scene.Base {
 		Collections.addAll(bodies,
 				Body.textured(HalfSpace.pn(Vec3.xyz( 1,  0,  0), Vec3.xyz(-1,  0,  0)), tL),
 				Body.textured(HalfSpace.pn(Vec3.xyz(-1,  0,  0), Vec3.xyz( 1,  0,  0)), tR),
-				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  1,  0), Vec3.xyz( 0, -1,  0)), tU),
-				Body.textured(HalfSpace.pn(Vec3.xyz( 0, -1,  0), Vec3.xyz( 0,  1,  0)), tW),
-				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  0,  1), Vec3.xyz( 0,  0, -1)), tS)
+				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  1,  0), Vec3.xyz( 0, -1,  0)), Material.LIGHT),
+				Body.textured(HalfSpace.pn(Vec3.xyz( 0, -1,  0), Vec3.xyz( 0,  1,  0)), tS),
+				Body.textured(HalfSpace.pn(Vec3.xyz( 0,  0,  3), Vec3.xyz( 0,  0, -1)), tW)
 		);
 		
 		Collections.addAll(lights,
