@@ -19,9 +19,9 @@ public interface Collider {
 		Collision collision = collide(r);
 		return (collision != null) && (collision.hit().t() < 1);
 	}
-	
-	
-	public static record Collision (
+
+
+	public static record Collision  (
 			Hit hit, Body body
 	) {}
 	

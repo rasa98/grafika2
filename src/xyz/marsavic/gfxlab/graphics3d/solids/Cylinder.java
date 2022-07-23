@@ -4,7 +4,7 @@ import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
 
 
-public class Cylinder extends SolidBBox {
+public class Cylinder extends Solid {
 
 	private final Vec3 c;
 	private final double r;
@@ -27,7 +27,7 @@ public class Cylinder extends SolidBBox {
 		lower = c.y() - h2;
 		rSqr = r * r;
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 
 

@@ -6,7 +6,7 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.utils.Numeric;
 
 
-public class Ball extends SolidBBox {
+public class Ball extends Solid {
 	
 	private final Vec3 c;
 	private final double r;
@@ -21,7 +21,7 @@ public class Ball extends SolidBBox {
 		this.r = r;
 		rSqr = r * r;
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 	
 	

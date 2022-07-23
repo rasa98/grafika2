@@ -7,7 +7,7 @@ import org.apache.commons.math3.analysis.solvers.LaguerreSolver;
 import org.apache.commons.math3.complex.Complex;
 
 
-public class Torus extends SolidBBox {
+public class Torus extends Solid {
 
 	private final double A;
 	private final Vec3 O;
@@ -22,7 +22,7 @@ public class Torus extends SolidBBox {
 		this.A = A;
 		this.r = r;
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 
 

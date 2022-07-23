@@ -4,7 +4,7 @@ import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
 
 
-public class Cone extends SolidBBox {
+public class Cone extends Solid {
 
 	private final Vec3 yEnd;
 	private final double r;
@@ -40,7 +40,7 @@ public class Cone extends SolidBBox {
 		rSqr = r * r;
 		k = r / h;
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 
 

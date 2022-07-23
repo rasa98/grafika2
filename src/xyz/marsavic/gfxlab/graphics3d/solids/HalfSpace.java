@@ -5,7 +5,7 @@ import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
 
 
-public class HalfSpace extends SolidBBox {
+public class HalfSpace extends Solid {
 	
 	private final Vec3 p; // A point on the boundary plane
 	private final Vec3 e; // A vector parallel to the boundary plane.

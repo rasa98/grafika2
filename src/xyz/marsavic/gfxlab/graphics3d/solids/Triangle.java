@@ -7,7 +7,7 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 import java.util.List;
 
 
-public class Triangle extends SolidBBox {
+public class Triangle extends Solid {
 
 	private final double EPSILON = 1e-9;
 	private final Vec3 p1;
@@ -27,7 +27,7 @@ public class Triangle extends SolidBBox {
 		e2 = p3.sub(p1);
 		n = e1.cross(e2);
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 	
 	

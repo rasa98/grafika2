@@ -58,8 +58,8 @@ public class BVH {
                 bodies.remove(i);
             }
             else{
-                SolidBBox s = (SolidBBox) body.solid();
-                localBBox = localBBox.addBBox(s.getBBox());
+                Solid s = (Solid) body.solid();
+                localBBox = localBBox.addBBox(s.bbox());
             }
         }
         root.bbox = localBBox;
@@ -83,28 +83,28 @@ public class BVH {
 
         for(int i=bvh.bodies.size() - 1; i>=0; i--){
             Body b = bvh.bodies.get(i);
-            SolidBBox s = (SolidBBox) b.solid();
+            Solid s = b.solid();
 
-            BoundingBox.hasBBox e = leftHalf.hasBBox(s.getBBox());
+            BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
             switch (e){
                 case Full:
                     leftBodies.add(b);
-                    left.addBBox(s.getBBox());
+                    left.addBBox(s.bbox());
 
                 break;
                 case None:
                     rightBodies.add(b);
-                    right.addBBox(s.getBBox());
+                    right.addBBox(s.bbox());
                 break;
                 default:
                     if(leftBodies.size() >= rightBodies.size()){
                         rightBodies.add(b);
-                        right.addBBox(s.getBBox());
+                        right.addBBox(s.bbox());
                     }
                     else{
                         leftBodies.add(b);
-                        left.addBBox(s.getBBox());
+                        left.addBBox(s.bbox());
                     }
             }
             bvh.bodies.remove(i);
@@ -146,18 +146,21 @@ public class BVH {
 
     public Collider.Collision getBestCollision(Ray ray, double epsilon, List<Body> bodies, Collider.Collision minC){
         double minT = minC != null? minC.hit().t() : Double.MAX_VALUE;
+        Body minBody = null;
+        Hit minHit = null;
         for(Body body: bodies) {
-            SolidBBox s = (SolidBBox) body.solid();
+            Solid s = body.solid();
             Hit hit = s.firstHit(ray, epsilon);
             if(hit != null){
                 double hitT = hit.t();
                 if(hitT > 0 && hitT < minT){
                     minT = hitT;
-                    minC = new Collider.Collision(hit, body);
+                    minBody = body;
+                    minHit = hit;
                 }
             }
         }
-        return minC;
+        return minBody != null ? new Collider.Collision(minHit , minBody) : minC;
     }
 
 

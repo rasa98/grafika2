@@ -1,12 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
-import com.google.common.collect.Lists;
 import xyz.marsavic.gfxlab.Vec3;
-import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
-import xyz.marsavic.gfxlab.graphics3d.Solid;
-
-import java.util.List;
 
 
 public class SmoothTriangle extends Triangle {
@@ -23,7 +18,7 @@ public class SmoothTriangle extends Triangle {
 		this.n2 = n2;
 		this.n3 = n3;
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 	
 	

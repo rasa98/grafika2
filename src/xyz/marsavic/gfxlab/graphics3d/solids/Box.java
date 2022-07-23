@@ -7,7 +7,7 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.utils.Numeric;
 
 
-public class Box extends SolidBBox {
+public class Box extends Solid {
 	
 	public static final BoxedObjectFactory.PQ<Box> $ = Box::new;
 	public static Box UNIT = Box.$.pq(Vec3.ZERO, Vec3.EXYZ);
@@ -20,7 +20,7 @@ public class Box extends SolidBBox {
 		this.p = p;
 		this.q = q;
 
-		setBBox(calculateBBox());
+		bbox(calculateBBox());
 	}
 	
 

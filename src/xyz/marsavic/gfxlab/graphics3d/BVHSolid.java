@@ -6,10 +6,10 @@ import java.util.*;
 public class BVHSolid {
 
     private BoundingBox bbox;
-    private List<SolidBBox> solids;
+    private List<Solid> solids;
 
     //Used only for root
-    public List<SolidBBox> outliers;
+    public List<Solid> outliers;
 
     private BVHSolid left, right;
 
@@ -17,7 +17,7 @@ public class BVHSolid {
         this.solids = new ArrayList<>();
     }
 
-    private BVHSolid(List<SolidBBox> solids) {
+    private BVHSolid(List<Solid> solids) {
         this.solids = solids;
     }
 
@@ -33,31 +33,31 @@ public class BVHSolid {
         this.right = right;
     }
 
-    private BVHSolid(BoundingBox bbox, List<SolidBBox> solids, BVHSolid left, BVHSolid right) {
+    private BVHSolid(BoundingBox bbox, List<Solid> solids, BVHSolid left, BVHSolid right) {
         this.bbox = bbox;
         this.solids = solids;
         this.left = left;
         this.right = right;
     }
 
-    private BVHSolid(BoundingBox bbox, List<SolidBBox> rightSolids) {
+    private BVHSolid(BoundingBox bbox, List<Solid> rightSolids) {
         this(rightSolids);
         this.bbox = bbox;
     }
 
-    public static BVHSolid makeBVH(List<SolidBBox> solids, int amount) {
-        BVHSolid root = new BVHSolid(new ArrayList<SolidBBox>());
+    public static BVHSolid makeBVH(List<Solid> solids, int amount) {
+        BVHSolid root = new BVHSolid(new ArrayList<Solid>());
         BoundingBox localBBox = new BoundingBox();
 
-        List<SolidBBox> NoBBoxSolids = new ArrayList<>();
+        List<Solid> NoBBoxSolids = new ArrayList<>();
         for(int i=solids.size() - 1; i>=0; i--){
-            SolidBBox s = solids.get(i);
+            Solid s = solids.get(i);
             if(s instanceof HalfSpace){
                 NoBBoxSolids.add(s);
                 solids.remove(i);
             }
             else{
-                localBBox = localBBox.addBBox(s.getBBox());
+                localBBox = localBBox.addBBox(s.bbox());
             }
         }
         root.bbox = localBBox;
@@ -74,34 +74,34 @@ public class BVHSolid {
         }
         BoundingBox leftHalf = bvh.bbox.getLeftHalf();
 
-        List<SolidBBox> leftSolids = new ArrayList<>();
-        List<SolidBBox> rightSolids = new ArrayList<>();
+        List<Solid> leftSolids = new ArrayList<>();
+        List<Solid> rightSolids = new ArrayList<>();
         BoundingBox left = new BoundingBox();
         BoundingBox right = new BoundingBox();
 
         for(int i = bvh.solids.size() - 1; i>=0; i--){
-            SolidBBox s = bvh.solids.get(i);
+            Solid s = bvh.solids.get(i);
 
-            BoundingBox.hasBBox e = leftHalf.hasBBox(s.getBBox());
+            BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
             switch (e){
                 case Full:
                     leftSolids.add(s);
-                    left = left.addBBox(s.getBBox());
+                    left = left.addBBox(s.bbox());
 
                     break;
                 case None:
                     rightSolids.add(s);
-                    right = right.addBBox(s.getBBox());
+                    right = right.addBBox(s.bbox());
                     break;
                 default:
                     if(leftSolids.size() >= rightSolids.size()){
                         rightSolids.add(s);
-                        right = right.addBBox(s.getBBox());
+                        right = right.addBBox(s.bbox());
                     }
                     else{
                         leftSolids.add(s);
-                        left = left.addBBox(s.getBBox());
+                        left = left.addBBox(s.bbox());
                     }
             }
             bvh.solids.remove(i);
@@ -118,7 +118,7 @@ public class BVHSolid {
         if(bbox.rayHitsBox(ray, epsilon)){
             double minT = Double.MAX_VALUE;
 
-            for(SolidBBox s: solids) {
+            for(Solid s: solids) {
                 Hit hit = s.firstHit(ray, epsilon);
                 if(hit != null){
                     double hitT = hit.t();
