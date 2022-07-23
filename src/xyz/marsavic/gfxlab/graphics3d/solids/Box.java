@@ -16,13 +16,12 @@ public class Box extends SolidBBox {
 	private final Vec3 p, q;
 	
 	
-	public Box(Vec3 p, Vec3 q) {
+	private Box(Vec3 p, Vec3 q) {
 		this.p = p;
 		this.q = q;
 
 		setBBox(calculateBBox());
 	}
-	
 
 	public Vec3 p() {
 		return p;
@@ -73,7 +72,7 @@ public class Box extends SolidBBox {
 
 	@Override
 	protected BoundingBox calculateBBox() {
-		return p.x() <= q.x() ? new BoundingBox(this) : new BoundingBox(new Box(q, p));
+		return p.x() <= q.x() ? new BoundingBox(this) : new BoundingBox(Box.$.pq(q, p));
 //		return new BoundingBox(this);
 	}
 

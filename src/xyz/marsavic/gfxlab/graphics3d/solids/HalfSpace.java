@@ -32,6 +32,8 @@ public class HalfSpace extends SolidBBox {
 		e_f = ef / fLSqr;
 		f_e = ef / eLSqr;
 		sinSqr = 1 - e_f * f_e;
+
+		setBBox(calculateBBox());
 	}
 	
 	
@@ -99,9 +101,9 @@ public class HalfSpace extends SolidBBox {
 		// nzm dal je uredu....cisto da ima ..
 		//return new BoundingBox();
 
-//		return new BoundingBox(Vec3.xyz(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE),
-//				Vec3.xyz(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
-		throw new RuntimeException("class HalfSpace doesnt have BoundingBox");
+		return new BoundingBox(Vec3.ONES.mul(-3*10e30),
+							   Vec3.ONES.mul( 3*10e30));
+//		throw new RuntimeException("class HalfSpace doesnt have BoundingBox");
 	}
 
 

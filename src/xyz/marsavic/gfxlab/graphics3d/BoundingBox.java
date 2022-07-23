@@ -12,7 +12,7 @@ public class BoundingBox {
 
     public BoundingBox() {
 //        this.min = Vec3.xyz(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-//        this.max = Vec3.xyz(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+//        this.max = Vec3.xyz(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE);
         this(Vec3.xyz(3.14 * 10e30, 3.14 * 10e30, 3.14 * 10e30),
                 Vec3.xyz(-3.14 * 10e30, -3.14 * 10e30, -3.14 * 10e30));
     }
@@ -21,7 +21,8 @@ public class BoundingBox {
 //        this.min = min;
 //        this.max = max;
 
-        box = new Box(min, max);//Box.$.pd(min, max);
+//        box = new Box(min, max);
+        box = Box.$.pq(min, max);
     }
 
     public BoundingBox(Box box) {
