@@ -80,7 +80,7 @@ public interface Collider {
 
 
 		public BvhCollider(Collection<Body> bodies) {
-			this.root = BVH.makeBVH((List<Body>) bodies, 2);
+			this.root = BVH.makeBVH((List<Body>) bodies, 3);
 		}
 
 
