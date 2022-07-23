@@ -2,7 +2,6 @@ package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.graphics3d.solids.HalfSpace;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class BVH {
@@ -47,10 +46,8 @@ public class BVH {
     }
 
     public static BVH makeBVH(List<Body> bodies, int amount) {
-        BVH root = new BVH(new ArrayList<Body>()){
+        BVH root = new BVH(new ArrayList<Body>()){};
 
-        };
-//        Body[] b = bodies.toArray(new Body[0]);
         BoundingBox localBBox = new BoundingBox();
 
         List<Body> NoBBoxSolids = new ArrayList<>();
@@ -76,23 +73,19 @@ public class BVH {
         if(bvh.bodies.size() < amount){
             return;
         }
-        BoundingBox[] children = bvh.bbox.splitBox();
+        BoundingBox leftHalf = bvh.bbox.getLeftHalf();
 
-        BoundingBox leftHalf = children[0];
-        BoundingBox rightHalf = children[1];
         List<Body> leftBodies = new ArrayList<>();
         List<Body> rightBodies = new ArrayList<>();
         BoundingBox left = new BoundingBox();
         BoundingBox right = new BoundingBox();
-//        bvh.left = new BVH(children[0]);
-//        bvh.right = new BVH(children[1]);
+
 
         for(int i=bvh.bodies.size() - 1; i>=0; i--){
             Body b = bvh.bodies.get(i);
             SolidBBox s = (SolidBBox) b.solid();
 
             BoundingBox.hasBBox e = leftHalf.hasBBox(s.getBBox());
-//            BoundingBox.hasBBox e = bvh.left.bbox.hasBBox(s.getBBox());
 
             switch (e){
                 case Full:
@@ -143,7 +136,6 @@ public class BVH {
                 if(rightC != null){
                     double t = rightC.hit().t();
                     if(t > 0 && t < minT){
-                        minT = t;
                         minC = rightC;
                     }
                 }
@@ -153,8 +145,7 @@ public class BVH {
     }
 
     public Collider.Collision getBestCollision(Ray ray, double epsilon, List<Body> bodies, Collider.Collision minC){
-        double minT;
-        minT = minC != null? minC.hit().t() : Double.MAX_VALUE;
+        double minT = minC != null? minC.hit().t() : Double.MAX_VALUE;
         for(Body body: bodies) {
             SolidBBox s = (SolidBBox) body.solid();
             Hit hit = s.firstHit(ray, epsilon);

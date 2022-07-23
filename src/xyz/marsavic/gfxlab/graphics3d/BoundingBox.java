@@ -88,7 +88,7 @@ public class BoundingBox {
         return box.firstHit(ray, afterTime) != null;
     }
 
-    public BoundingBox[] splitBox(){
+    public BoundingBox getLeftHalf(){
         double x0 = box.p().x();
         double y0 = box.p().y();
         double z0 = box.p().z();
@@ -112,9 +112,8 @@ public class BoundingBox {
             z1 = z0;
         }
 
-        Vec3 mid_min = Vec3.xyz(x0, y0, z0);
         Vec3 mid_max = Vec3.xyz(x1, y1, z1);
-        return new BoundingBox[] {new BoundingBox(box.p(), mid_max), new BoundingBox(mid_min, box.q())};
+        return new BoundingBox(box.p(), mid_max);
     }
 
 
