@@ -17,8 +17,6 @@ public class SmoothTriangle extends Triangle {
 		this.n1 = n1;
 		this.n2 = n2;
 		this.n3 = n3;
-
-		bbox(calculateBBox());
 	}
 	
 	

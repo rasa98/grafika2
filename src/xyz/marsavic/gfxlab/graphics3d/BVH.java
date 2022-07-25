@@ -46,19 +46,18 @@ public class BVH {
     }
 
     public static BVH makeBVH(List<Body> bodies, int amount) {
-        BVH root = new BVH(new ArrayList<Body>()){};
-
+        BVH root = new BVH(new ArrayList<>()){};
         BoundingBox localBBox = new BoundingBox();
 
         List<Body> NoBBoxSolids = new ArrayList<>();
         for(int i=bodies.size() - 1; i>=0; i--){
             Body body = bodies.get(i);
-            if(body.solid() instanceof HalfSpace){
+            Solid s = body.solid();
+            if(s instanceof HalfSpace){
                 NoBBoxSolids.add(body);
                 bodies.remove(i);
             }
             else{
-                Solid s = (Solid) body.solid();
                 localBBox = localBBox.addBBox(s.bbox());
             }
         }
@@ -121,7 +120,7 @@ public class BVH {
         Collider.Collision minC = null;
         if(bbox.rayHitsBox(ray, epsilon)){
             double minT = Double.MAX_VALUE;
-            minC = getBestCollision(ray, epsilon, bodies, minC);
+            minC = getBestCollision(ray, epsilon, bodies, null);
             if(left != null){
                 Collider.Collision leftC = left.getCollision(ray, epsilon);
                 Collider.Collision rightC = right.getCollision(ray, epsilon);

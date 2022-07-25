@@ -1,6 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.graphics3d.solids.HalfSpace;
+
 import java.util.*;
 
 public class BVHSolid {
@@ -10,7 +11,6 @@ public class BVHSolid {
 
     //Used only for root
     public List<Solid> outliers;
-
     private BVHSolid left, right;
 
     private BVHSolid() {
@@ -46,7 +46,7 @@ public class BVHSolid {
     }
 
     public static BVHSolid makeBVH(List<Solid> solids, int amount) {
-        BVHSolid root = new BVHSolid(new ArrayList<Solid>());
+        BVHSolid root = new BVHSolid(new ArrayList<>());
         BoundingBox localBBox = new BoundingBox();
 
         List<Solid> NoBBoxSolids = new ArrayList<>();
@@ -62,7 +62,6 @@ public class BVHSolid {
         }
         root.bbox = localBBox;
         root.solids = solids;
-
         divideBVH(root, amount);
         root.outliers = NoBBoxSolids;
         return root;
