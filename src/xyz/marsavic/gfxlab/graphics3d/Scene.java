@@ -42,7 +42,7 @@ public interface Scene {
 
 		@Override
 		public double getT(double x) {
-			return t1 + x * (t2 - t1);
+			return t1 + x*x * (t2 - t1);
 		}
 
 

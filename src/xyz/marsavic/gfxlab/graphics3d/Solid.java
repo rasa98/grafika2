@@ -1,6 +1,8 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 
+import xyz.marsavic.functions.interfaces.Function1;
+
 public interface Solid {
 	
 	/**
@@ -27,6 +29,24 @@ public interface Solid {
 					return null;
 				}
 				return hitO.withN(tInvTransposed.applyTo(hitO.n()));
+			}
+		};
+	}
+
+	default Solid transformedMotionBlur(Function1<Affine, Double> t) {
+		return new Solid() {
+			private final Function1<Affine, Double> tInvF = t; //t.inverse();
+			//private final Affine tInvTransposed = tInv.transposeWithoutTranslation();
+
+			@Override
+			public Hit firstHit(Ray ray, double t, double afterTime) {
+				Affine tInv = tInvF.at(t);
+				Ray rayO = tInv.applyTo(ray);
+				Hit hitO = Solid.this.firstHit(rayO, t, afterTime);
+				if (hitO == null) {
+					return null;
+				}
+				return hitO.withN(tInv.transposeWithoutTranslation().applyTo(hitO.n()));
 			}
 		};
 	}
