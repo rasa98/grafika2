@@ -29,8 +29,8 @@ public abstract class RayTracer implements ColorSamplerT {
 	public Collider collider() {
 		return collider;
 	}
-	
-	
+
+
 	protected abstract Color sample(Ray ray);
 	
 	

@@ -2,12 +2,17 @@ package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.Vec3;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
+
 public abstract class Solid {
     private BoundingBox bbox;
 
     protected abstract BoundingBox calculateBBox();
 
-    public abstract Hit firstHit(Ray ray, double afterTime);
+    public Hit firstHit(Ray ray, double afterTime){
+        return firstHit(ray, afterTime);
+    };
 
     public BoundingBox bbox(){
         return bbox;
@@ -20,6 +25,8 @@ public abstract class Solid {
         Solid res = new Solid() {
             private final Affine tInv = t.inverse();
             private final Affine tInvTransposed = tInv.transposeWithoutTranslation();
+
+
 
             @Override
             public Hit firstHit(Ray ray, double afterTime) {
@@ -46,6 +53,53 @@ public abstract class Solid {
                 return bb.addPoint(t.applyTo(p1)).addPoint(t.applyTo(p2)).addPoint(t.applyTo(p3)).addPoint(t.applyTo(p4))
                         .addPoint(t.applyTo(p5)).addPoint(t.applyTo(p6)).addPoint(t.applyTo(p7)).addPoint(t.applyTo(p8));
             }
+
+
+        };
+        res.bbox(res.calculateBBox());
+        return res;
+    }
+
+    public Solid transformedMotionBlur(Function<Double, Affine> affineF) {
+        Solid res = new Solid() {
+            final ThreadLocalRandom rGen = ThreadLocalRandom.current();
+
+            @Override
+            public Hit firstHit(Ray ray, double afterTime) {
+                double t = rGen.nextDouble();
+                Affine a = affineF.apply(1 - (t*t));
+                Ray rayO = a.applyTo(ray);
+                Hit hitO = Solid.this.firstHit(rayO, afterTime);
+                if (hitO == null) {
+                    return null;
+                }
+                return hitO.withN(a.transposeWithoutTranslation().applyTo(hitO.n()));
+            }
+
+            @Override
+            protected BoundingBox calculateBBox() {
+                Affine start = affineF.apply(0.);
+                Affine end = affineF.apply(1.);
+
+                BoundingBox bb = Solid.this.bbox;
+                Vec3 p1 = bb.box.p();
+                Vec3 p2 = bb.box.q();
+                Vec3 p3 = Vec3.xyz(bb.box.p().x(), bb.box.p().y(), bb.box.q().z());
+                Vec3 p4 = Vec3.xyz(bb.box.p().x(), bb.box.q().y(), bb.box.p().z());
+                Vec3 p5 = Vec3.xyz(bb.box.p().x(), bb.box.q().y(), bb.box.q().z());
+                Vec3 p6 = Vec3.xyz(bb.box.q().x(), bb.box.p().y(), bb.box.p().z());
+                Vec3 p7 = Vec3.xyz(bb.box.q().x(), bb.box.p().y(), bb.box.q().z());
+                Vec3 p8 = Vec3.xyz(bb.box.q().x(), bb.box.q().y(), bb.box.p().z());
+
+                for(Vec3 v: new Vec3[]{p1, p2, p3, p4, p5, p6, p7, p8}){
+                    bb = bb.addPoint(start.applyTo(v))
+                           .addPoint(end.applyTo(v));
+                }
+
+                return bb;
+            }
+
+
         };
         res.bbox(res.calculateBBox());
         return res;

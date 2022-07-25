@@ -13,6 +13,10 @@ public interface Collider {
 	 * If there is no collision, null is returned.
 	 */
 	Collision collide(Ray r);
+
+	default Collision collide(Ray r, double t){
+		return collide(r);
+	};
 	
 	
 	default boolean collidesIn01(Ray r) {
@@ -86,6 +90,11 @@ public interface Collider {
 
 		@Override
 		public Collision collide(Ray r) {
+			return collide(r, 0);
+		}
+
+		@Override
+		public Collision collide(Ray r, double t) {
 			Collision c = root.getCollision(r, EPSILON);
 			return root.getBestCollision(r, EPSILON, root.outliers, c);
 

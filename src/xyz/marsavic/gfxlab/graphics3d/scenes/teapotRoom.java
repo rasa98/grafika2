@@ -46,8 +46,9 @@ public class teapotRoom extends Scene.Base {
 			objBodies.add(Body.uniform(tm.transformed(Affine.scaling(0.04)
 													  .andThen(Affine.rotationAboutX(-0.25)
 													  .andThen(Affine.rotationAboutZ(-0.14)
-													  .andThen(Affine.translation(Vec3.xyz(-0.8, -0.77, -0.3)))))),
-						  Material.MIRROR));
+													  .andThen(Affine.translation(Vec3.xyz(-1.0, -0.77, -0.3))))))
+							.transformedMotionBlur(t -> Affine.translation(Vec3.xyz(-0.2*t, 0, 0))),
+						  Material.matte(0.25)));
 		}
 
 		meshes = readTriMeshFromFile("resources/obj/dragon.obj", 10);

@@ -19,8 +19,7 @@ public class PathTracer extends RayTracerSimple {
 		super(scene, colliderFactory, camera);
 		this.maxDepth = maxDepth;
 	}
-	
-	
+
 	@Override
 	protected Color sample(Ray ray) {
 		return radiance(ray, maxDepth);

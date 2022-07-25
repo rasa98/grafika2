@@ -14,8 +14,10 @@ public class Sonar extends RayTracer {
 	public Sonar(Scene scene, Function1<Collider, Collection<Body>> colliderFactory, Camera camera) {
 		super(scene, colliderFactory, camera);
 	}
-	
-	
+
+	protected Color sample(Ray ray, double t) {
+		return sample(ray);
+	}
 	@Override
 	protected Color sample(Ray ray) {
 		Collider.Collision collision = collider().collide(ray);
