@@ -6,6 +6,8 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 
 public class Cylinder extends Solid {
 
+	public static Cylinder UNIT = Cylinder.crh(Vec3.ZERO, 0.5, 1);
+
 	private final Vec3 c;
 	private final double r;
 

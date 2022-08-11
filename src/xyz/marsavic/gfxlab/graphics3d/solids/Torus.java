@@ -9,6 +9,8 @@ import org.apache.commons.math3.complex.Complex;
 
 public class Torus extends Solid {
 
+	public static Torus UNIT = Torus.crh(Vec3.ZERO, 0.75, 0.25);
+
 	private final double A;
 	private final Vec3 O;
 

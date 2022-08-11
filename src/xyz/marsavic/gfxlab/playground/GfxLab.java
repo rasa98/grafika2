@@ -7,6 +7,7 @@ import xyz.marsavic.gfxlab.graphics3d.cameras.Perspective;
 import xyz.marsavic.gfxlab.graphics3d.cameras.TransformedCamera;
 import xyz.marsavic.gfxlab.graphics3d.raytracers.PathTracer;
 import xyz.marsavic.gfxlab.graphics3d.scenes.*;
+import xyz.marsavic.gfxlab.graphics3d.scenes.myScenes.*;
 import xyz.marsavic.gfxlab.tonemapping.ColorTransformForColorMatrix;
 import xyz.marsavic.gfxlab.tonemapping.ToneMappingFunctionSimple;
 import xyz.marsavic.objectinstruments.annotations.GadgetDouble;
@@ -67,7 +68,13 @@ public class GfxLab {
 //				new TestGICylinderCone();
 //				new TestGITorus(rotX, rotY, rotZ);
 //				new PyramidInRoom();
-				new teapotRoom();
+
+//				new teapotMotionRoom();
+//				new TriMeshDragonRoom();
+//				new UnionRoom();
+//				new cubeRandomRoom();
+				new CombineAllRoom();
+
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),
 				Affine.IDENTITY

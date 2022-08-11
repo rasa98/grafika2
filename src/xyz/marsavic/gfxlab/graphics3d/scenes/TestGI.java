@@ -13,7 +13,7 @@ import java.util.Collections;
 public class TestGI extends Scene.Base {
 	
 	public TestGI() {
-		addAllFrom(new OpenRoomRGTextured_GI());
+		addAllFrom(OpenRoomRGTextured_GI.room);
 		
 		Material glass = new Material(BSDF.mix(BSDF.refractive(1.4), BSDF.REFLECTIVE, 0.05));
 		

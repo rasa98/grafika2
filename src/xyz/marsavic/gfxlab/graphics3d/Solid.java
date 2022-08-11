@@ -1,7 +1,11 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
+import com.google.common.collect.Lists;
 import xyz.marsavic.gfxlab.Vec3;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -41,20 +45,15 @@ public abstract class Solid {
             @Override
             protected BoundingBox calculateBBox() {
                 BoundingBox bb = Solid.this.bbox;
-                Vec3 p1 = bb.box.p();
-                Vec3 p2 = bb.box.q();
-                Vec3 p3 = Vec3.xyz(bb.box.p().x(), bb.box.p().y(), bb.box.q().z());
-                Vec3 p4 = Vec3.xyz(bb.box.p().x(), bb.box.q().y(), bb.box.p().z());
-                Vec3 p5 = Vec3.xyz(bb.box.p().x(), bb.box.q().y(), bb.box.q().z());
-                Vec3 p6 = Vec3.xyz(bb.box.q().x(), bb.box.p().y(), bb.box.p().z());
-                Vec3 p7 = Vec3.xyz(bb.box.q().x(), bb.box.p().y(), bb.box.q().z());
-                Vec3 p8 = Vec3.xyz(bb.box.q().x(), bb.box.q().y(), bb.box.p().z());
+                BoundingBox bbNew = new BoundingBox();
 
-                return bb.addPoint(t.applyTo(p1)).addPoint(t.applyTo(p2)).addPoint(t.applyTo(p3)).addPoint(t.applyTo(p4))
-                        .addPoint(t.applyTo(p5)).addPoint(t.applyTo(p6)).addPoint(t.applyTo(p7)).addPoint(t.applyTo(p8));
+                Vec3[] corners = bb.box.getCorners();
+                for(Vec3 point : corners){
+                    bbNew = bbNew.addPoint(t.applyTo(point));
+                }
+
+                return bbNew;
             }
-
-
         };
         res.bbox(res.calculateBBox());
         return res;
@@ -82,45 +81,43 @@ public abstract class Solid {
                 Affine end = affineF.apply(1.);
 
                 BoundingBox bb = Solid.this.bbox;
-                Vec3 p1 = bb.box.p();
-                Vec3 p2 = bb.box.q();
-                Vec3 p3 = Vec3.xyz(bb.box.p().x(), bb.box.p().y(), bb.box.q().z());
-                Vec3 p4 = Vec3.xyz(bb.box.p().x(), bb.box.q().y(), bb.box.p().z());
-                Vec3 p5 = Vec3.xyz(bb.box.p().x(), bb.box.q().y(), bb.box.q().z());
-                Vec3 p6 = Vec3.xyz(bb.box.q().x(), bb.box.p().y(), bb.box.p().z());
-                Vec3 p7 = Vec3.xyz(bb.box.q().x(), bb.box.p().y(), bb.box.q().z());
-                Vec3 p8 = Vec3.xyz(bb.box.q().x(), bb.box.q().y(), bb.box.p().z());
+                BoundingBox bbNew = new BoundingBox();
 
-                for(Vec3 v: new Vec3[]{p1, p2, p3, p4, p5, p6, p7, p8}){
-                    bb = bb.addPoint(start.applyTo(v))
-                           .addPoint(end.applyTo(v));
+                Vec3[] corners = bb.box.getCorners();
+                for(Vec3 point : corners){
+                    bbNew = bbNew.addPoint(start.applyTo(point))
+                                    .addPoint(end.applyTo(point));
                 }
 
-                return bb;
+                return bbNew;
             }
-
-
         };
         res.bbox(res.calculateBBox());
         return res;
     }
 
     abstract static class CsgSolid extends Solid {
+
+        private BVHSolid bvh = BVHSolid.makeBVH(Lists.newArrayList(children()), 3);
+
         abstract Solid[] children();
+
+        public Boolean ifBoxHit(Ray ray, double afterTime){
+            return bvh.getHit(ray, afterTime) != null;
+        }
 
 		@Override
         protected BoundingBox calculateBBox() {
-			// to do
 			BoundingBox bbox = new BoundingBox();
-			for( Solid c : children()){
-				bbox.addBBox(c.bbox());
-			}
 
+			for( Solid c : children()){
+				bbox = bbox.addBBox(c.bbox());
+			}
 			return bbox;
 		}
     }
 
-    static Solid union(Solid... solids) {
+    public static Solid union(Solid... solids) {
         Solid s = new CsgSolid() {
 
                 @Override
@@ -130,6 +127,79 @@ public abstract class Solid {
 
                 @Override
                 public Hit firstHit(Ray ray, double afterTime) {
+                    if(ifBoxHit(ray, afterTime)) {
+                        int n = solids.length;
+
+                        boolean[] in = new boolean[n];
+                        Hit[] hits = new Hit[n];
+                        double[] t = new double[n];
+
+                        int inCount = 0;
+
+                        for (int i = 0; i < n; i++) {
+                            Hit hit = solids[i].firstHit(ray, afterTime);
+                            if (hit == null) {
+                                t[i] = Double.POSITIVE_INFINITY;
+                                in[i] = false;
+                            } else {
+                                hits[i] = hit;
+                                t[i] = hit.t();
+                                in[i] = ray.d().dot(hit.n()) > 0;
+                                if (in[i]) {
+                                    inCount++;
+                                }
+                            }
+                        }
+
+                        while (true) {
+                            double tFirst = Double.POSITIVE_INFINITY;
+                            int iFirst = -1;
+                            for (int i = 0; i < n; i++) {
+                                if (t[i] < tFirst) {
+                                    tFirst = t[i];
+                                    iFirst = i;
+                                }
+                            }
+
+                            if (iFirst == -1) {
+                                return null;
+                            }
+
+                            if (in[iFirst]) {
+                                if (--inCount == 0) {
+                                    return hits[iFirst];
+                                }
+                                in[iFirst] = false;
+                            } else {
+                                if (inCount++ == 0) {
+                                    return hits[iFirst];
+                                }
+                                in[iFirst] = true;
+                            }
+
+                            hits[iFirst] = solids[iFirst].firstHit(ray, tFirst);
+                            t[iFirst] = hits[iFirst] == null ? Double.POSITIVE_INFINITY : hits[iFirst].t();
+
+                        }
+                    }
+                    return null;
+                }
+            };
+        s.bbox(s.calculateBBox());
+        return s;
+    }
+
+
+    public static Solid intersection(Solid... solids) {
+        Solid s = new CsgSolid() {
+            @Override
+            public Solid[] children() {
+                return solids;
+            }
+
+            @Override
+            public Hit firstHit(Ray ray, double afterTime) {
+                if(ifBoxHit(ray, afterTime)) {
                     int n = solids.length;
 
                     boolean[] in = new boolean[n];
@@ -168,12 +238,12 @@ public abstract class Solid {
                         }
 
                         if (in[iFirst]) {
-                            if (--inCount == 0) {
+                            if (inCount-- == n) {
                                 return hits[iFirst];
                             }
                             in[iFirst] = false;
                         } else {
-                            if (inCount++ == 0) {
+                            if (++inCount == n) {
                                 return hits[iFirst];
                             }
                             in[iFirst] = true;
@@ -183,80 +253,14 @@ public abstract class Solid {
                         t[iFirst] = hits[iFirst] == null ? Double.POSITIVE_INFINITY : hits[iFirst].t();
                     }
                 }
-            };
-        s.bbox(s.calculateBBox());
-        return s;
-    }
-
-
-    static Solid intersection(Solid... solids) {
-        Solid s = new CsgSolid() {
-            @Override
-            public Solid[] children() {
-                return solids;
-            }
-
-            @Override
-            public Hit firstHit(Ray ray, double afterTime) {
-                int n = solids.length;
-
-                boolean[] in = new boolean[n];
-                Hit[] hits = new Hit[n];
-                double[] t = new double[n];
-
-                int inCount = 0;
-
-                for (int i = 0; i < n; i++) {
-                    Hit hit = solids[i].firstHit(ray, afterTime);
-                    if (hit == null) {
-                        t[i] = Double.POSITIVE_INFINITY;
-                        in[i] = false;
-                    } else {
-                        hits[i] = hit;
-                        t[i] = hit.t();
-                        in[i] = ray.d().dot(hit.n()) > 0;
-                        if (in[i]) {
-                            inCount++;
-                        }
-                    }
-                }
-
-                while (true) {
-                    double tFirst = Double.POSITIVE_INFINITY;
-                    int iFirst = -1;
-                    for (int i = 0; i < n; i++) {
-                        if (t[i] < tFirst) {
-                            tFirst = t[i];
-                            iFirst = i;
-                        }
-                    }
-
-                    if (iFirst == -1) {
-                        return null;
-                    }
-
-                    if (in[iFirst]) {
-                        if (inCount-- == n) {
-                            return hits[iFirst];
-                        }
-                        in[iFirst] = false;
-                    } else {
-                        if (++inCount == n) {
-                            return hits[iFirst];
-                        }
-                        in[iFirst] = true;
-                    }
-
-                    hits[iFirst] = solids[iFirst].firstHit(ray, tFirst);
-                    t[iFirst] = hits[iFirst] == null ? Double.POSITIVE_INFINITY : hits[iFirst].t();
-                }
+                return null;
             }
         };
         s.bbox(s.calculateBBox());
         return s;
     }
 
-    static Solid difference(Solid... solids) {
+    public static Solid difference(Solid... solids) {
         Solid s = new CsgSolid() {
             @Override
             public Solid[] children() {
@@ -264,58 +268,61 @@ public abstract class Solid {
             }
             @Override
             public Hit firstHit(Ray ray, double afterTime) {
-                int n = solids.length;
+                if(ifBoxHit(ray, afterTime)) {
+                    int n = solids.length;
 
-                boolean[] in = new boolean[n];
-                Hit[] hits = new Hit[n];
-                double[] t = new double[n];
+                    boolean[] in = new boolean[n];
+                    Hit[] hits = new Hit[n];
+                    double[] t = new double[n];
 
-                int inCount = 0;
+                    int inCount = 0;
 
-                for (int i = 0; i < n; i++) {
-                    Hit hit = solids[i].firstHit(ray, afterTime);
-                    if (hit == null) {
-                        t[i] = Double.POSITIVE_INFINITY;
-                        in[i] = false;
-                    } else {
-                        hits[i] = hit;
-                        t[i] = hit.t();
-                        in[i] = ray.d().dot(hit.n()) > 0;
-                        if (in[i]) {
-                            inCount++;
-                        }
-                    }
-                }
-
-                while (true) {
-                    double tFirst = Double.POSITIVE_INFINITY;
-                    int iFirst = -1;
                     for (int i = 0; i < n; i++) {
-                        if (t[i] < tFirst) {
-                            tFirst = t[i];
-                            iFirst = i;
+                        Hit hit = solids[i].firstHit(ray, afterTime);
+                        if (hit == null) {
+                            t[i] = Double.POSITIVE_INFINITY;
+                            in[i] = false;
+                        } else {
+                            hits[i] = hit;
+                            t[i] = hit.t();
+                            in[i] = ray.d().dot(hit.n()) > 0;
+                            if (in[i]) {
+                                inCount++;
+                            }
                         }
                     }
 
-                    if (iFirst == -1) {
-                        return null;
-                    }
-
-                    if (iFirst == 0) {
-                        if (!in[1]) {
-                            return hits[0];
+                    while (true) {
+                        double tFirst = Double.POSITIVE_INFINITY;
+                        int iFirst = -1;
+                        for (int i = 0; i < n; i++) {
+                            if (t[i] < tFirst) {
+                                tFirst = t[i];
+                                iFirst = i;
+                            }
                         }
-                        in[0] ^= true;
-                    } else {
-                        if (in[0]) {
-                            return hits[1].inverse();
-                        }
-                        in[1] ^= true;
-                    }
 
-                    hits[iFirst] = solids[iFirst].firstHit(ray, tFirst);
-                    t[iFirst] = hits[iFirst] == null ? Double.POSITIVE_INFINITY : hits[iFirst].t();
+                        if (iFirst == -1) {
+                            return null;
+                        }
+
+                        if (iFirst == 0) {
+                            if (!in[1]) {
+                                return hits[0];
+                            }
+                            in[0] ^= true;
+                        } else {
+                            if (in[0]) {
+                                return hits[1].inverse();
+                            }
+                            in[1] ^= true;
+                        }
+
+                        hits[iFirst] = solids[iFirst].firstHit(ray, tFirst);
+                        t[iFirst] = hits[iFirst] == null ? Double.POSITIVE_INFINITY : hits[iFirst].t();
+                    }
                 }
+                return null;
             }
         };
         s.bbox(s.calculateBBox());

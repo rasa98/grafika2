@@ -47,6 +47,19 @@ public class Box extends Solid {
 	public Vec3 r() {
 		return d().div(2);
 	}
+
+
+	public Vec3[] getCorners(){
+		Vec3 p1 = p;
+		Vec3 p2 = q;
+		Vec3 p3 = Vec3.xyz(p.x(), p.y(), q.z());
+		Vec3 p4 = Vec3.xyz(p.x(), q.y(), p.z());
+		Vec3 p5 = Vec3.xyz(p.x(), q.y(), q.z());
+		Vec3 p6 = Vec3.xyz(q.x(), p.y(), p.z());
+		Vec3 p7 = Vec3.xyz(q.x(), p.y(), q.z());
+		Vec3 p8 = Vec3.xyz(q.x(), q.y(), p.z());
+		return new Vec3[] {p1, p2, p3, p4, p5, p6, p7, p8};
+	}
 	
 	
 	@Override

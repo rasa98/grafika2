@@ -6,6 +6,8 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 
 public class Cone extends Solid {
 
+	public static Cone UNIT = Cone.crh(Vec3.EY.mul(0.5), 0.5, 1);
+
 	private final Vec3 yEnd;
 	private final double r;
 

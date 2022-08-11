@@ -13,7 +13,7 @@ import java.util.Collections;
 public class TestGICylinderCone extends Scene.Base {
 
 	public TestGICylinderCone() {
-		addAllFrom(new OpenRoomRGTextured_GI());
+		addAllFrom(OpenRoomRGTextured_GI.room);
 		
 		Material glass = new Material(BSDF.mix(BSDF.refractive(1.4), BSDF.REFLECTIVE, 0.05));
 		

@@ -13,37 +13,17 @@ public class BVH {
     public List<Body> outliers;
     private BVH left, right;
 
-    private BVH() {
-        this.bodies = new ArrayList<>();
-    }
 
     private BVH(List<Body> bodies) {
         this.bodies = bodies;
     }
 
-    private BVH(BoundingBox bbox) {
-        this();
-        this.bbox = bbox;
-    }
 
     private BVH(BoundingBox bbox, List<Body> l) {
         this(l);
         this.bbox = bbox;
     }
 
-    private BVH(BoundingBox bbox, BVH left, BVH right) {
-        this();
-        this.bbox = bbox;
-        this.left = left;
-        this.right = right;
-    }
-
-    private BVH(BoundingBox bbox, List<Body> bodies, BVH left, BVH right) {
-        this.bbox = bbox;
-        this.bodies = bodies;
-        this.left = left;
-        this.right = right;
-    }
 
     public static BVH makeBVH(List<Body> bodies, int amount) {
         BVH root = new BVH(new ArrayList<>()){};
@@ -89,21 +69,21 @@ public class BVH {
             switch (e){
                 case Full:
                     leftBodies.add(b);
-                    left.addBBox(s.bbox());
+                    left = left.addBBox(s.bbox());
 
                 break;
                 case None:
                     rightBodies.add(b);
-                    right.addBBox(s.bbox());
+                    right = right.addBBox(s.bbox());
                 break;
                 default:
                     if(leftBodies.size() >= rightBodies.size()){
                         rightBodies.add(b);
-                        right.addBBox(s.bbox());
+                        right = right.addBBox(s.bbox());
                     }
                     else{
                         leftBodies.add(b);
-                        left.addBBox(s.bbox());
+                        left = left.addBBox(s.bbox());
                     }
             }
             bvh.bodies.remove(i);

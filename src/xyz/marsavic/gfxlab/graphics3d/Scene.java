@@ -42,7 +42,11 @@ public interface Scene {
 		
 		
 		public void addBodiesFrom(Scene other) {
-			bodies.addAll(other.bodies());
+			//to do change fields -> list to set
+			Set<Body> temp = new HashSet<>();
+			temp.addAll(bodies);
+			temp.addAll(other.bodies());
+			bodies = new ArrayList<>(temp);
 		}
 		
 		public void addLightsFrom(Scene other) {

@@ -7,7 +7,9 @@ import xyz.marsavic.utils.Numeric;
 
 
 public class Ball extends Solid {
-	
+
+
+	public static Ball UNIT = Ball.cr(Vec3.ZERO, 0.5);
 	private final Vec3 c;
 	private final double r;
 	

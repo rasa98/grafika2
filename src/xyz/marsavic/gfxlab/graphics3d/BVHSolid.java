@@ -13,31 +13,8 @@ public class BVHSolid {
     public List<Solid> outliers;
     private BVHSolid left, right;
 
-    private BVHSolid() {
-        this.solids = new ArrayList<>();
-    }
-
     private BVHSolid(List<Solid> solids) {
         this.solids = solids;
-    }
-
-    private BVHSolid(BoundingBox bbox) {
-        this();
-        this.bbox = bbox;
-    }
-
-    private BVHSolid(BoundingBox bbox, BVHSolid left, BVHSolid right) {
-        this();
-        this.bbox = bbox;
-        this.left = left;
-        this.right = right;
-    }
-
-    private BVHSolid(BoundingBox bbox, List<Solid> solids, BVHSolid left, BVHSolid right) {
-        this.bbox = bbox;
-        this.solids = solids;
-        this.left = left;
-        this.right = right;
     }
 
     private BVHSolid(BoundingBox bbox, List<Solid> rightSolids) {

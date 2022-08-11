@@ -3,16 +3,12 @@ package xyz.marsavic.gfxlab.graphics3d;
 import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.solids.SmoothTriangle;
 import xyz.marsavic.gfxlab.graphics3d.solids.Triangle;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
+
 public class Parser {
     List<Vec3> vertices;
-
-//    Map<String, List<Vec3>> groupToVertexList;
     List<Vec3> vertNormals;
     Map<String, List<Triangle>> groups;
 
@@ -22,7 +18,6 @@ public class Parser {
         vertices = new ArrayList<>();
         vertNormals = new ArrayList<>();
         groups = new HashMap<>();
-//        groupToVertexList = new HashMap<>();
         parseObjFile(file);
     }
 
@@ -56,10 +51,6 @@ public class Parser {
         groups.put(s, l);
     }
 
-    private Collection<List<Triangle>> ParsedFileToGroups(){
-        return groups.values();
-    }
-
     private void parseObjFile(InputStream file){
         Scanner sc = null;
         try {
@@ -73,20 +64,26 @@ public class Parser {
                         double v3 = Double.parseDouble(words[3]);
                         addVert(v1, v2, v3);
                     }else if(words[0].equals("f")){
-                        // refactor Ako face ima vise od 3, splituje se vise puta isto... u hashmap-u ili nesto tako
+                        // -1 ako je izostavljena inf
                         int numTri = words.length - 1 - 2;
+
+                        int[][] facePoints = new int[words.length - 1][3];
+                        for(int i=1; i<words.length; i++){
+                            String[] fPointData = words[i].split("[/]");
+                            for(int j=0;j<3;j++){
+                                facePoints[i-1][j] = fPointData[j].equals("")? -1 : Integer.parseInt(fPointData[j]);
+                            }
+                        }
+
                         for(int i=0; i< numTri;i++){
-                            String [] v1_info = words[1].split("[/]");
-                            int v1 = Integer.parseInt(v1_info[0]);
-                            int nv1 = Integer.parseInt(v1_info[2]);
+                            int v1 = facePoints[0][0];
+                            int nv1 = facePoints[0][2];
 
-                            String [] v2_info = words[i+2].split("[/]");
-                            int v2 = Integer.parseInt(v2_info[0]);
-                            int nv2 = Integer.parseInt(v2_info[2]);
+                            int v2 = facePoints[i+1][0];
+                            int nv2 = facePoints[i+1][2];
 
-                            String [] v3_info = words[i+3].split("[/]");
-                            int v3 = Integer.parseInt(v3_info[0]);
-                            int nv3 = Integer.parseInt(v3_info[2]);
+                            int v3 = facePoints[i+2][0];
+                            int nv3 = facePoints[i+2][2];
 
                             addSmoothTriangle(v1, v2, v3, nv1, nv2, nv3);
                         }
