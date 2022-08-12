@@ -14,10 +14,12 @@ import java.util.Map;
 
 public class CombineAllRoom extends Scene.Base {
 
-	public CombineAllRoom() {
+	public CombineAllRoom(double rotX, double rotY, double rotZ) {
 		addAllFrom(new cubeRandomRoom());
 		addAllFrom(new teapotMotionRoom());
 		addAllFrom(new TriMeshDragonRoom());
 		addAllFrom(new UnionRoom());
+		addAllFrom(new ConeRoom());
+//		addAllFrom(new TorusRoom(rotX, rotY, rotZ));
 	}
 }

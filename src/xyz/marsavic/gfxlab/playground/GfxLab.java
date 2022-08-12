@@ -6,7 +6,6 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.gfxlab.graphics3d.cameras.Perspective;
 import xyz.marsavic.gfxlab.graphics3d.cameras.TransformedCamera;
 import xyz.marsavic.gfxlab.graphics3d.raytracers.PathTracer;
-import xyz.marsavic.gfxlab.graphics3d.scenes.*;
 import xyz.marsavic.gfxlab.graphics3d.scenes.myScenes.*;
 import xyz.marsavic.gfxlab.tonemapping.ColorTransformForColorMatrix;
 import xyz.marsavic.gfxlab.tonemapping.ToneMappingFunctionSimple;
@@ -54,6 +53,9 @@ public class GfxLab {
 	public double rotY = 0;
 	@GadgetDouble(p = -1, q = 1)
 	public double rotZ = 0;
+
+//	@Gadget
+//	public Boolean topLight = False;
 	
 	synchronized void setup() {
 		scene =
@@ -64,16 +66,15 @@ public class GfxLab {
 //				new TestTransformed(phiX, phiY, phiZ);
 //				new TestCSG(t);
 //				new TestGI();
-//				new TestGICylinder();
-//				new TestGICylinderCone();
-//				new TestGITorus(rotX, rotY, rotZ);
+//				new Cylinder();
+//				new TorusRoom(rotX, rotY, rotZ);
 //				new PyramidInRoom();
-
+//				new ConeRoom();
 //				new teapotMotionRoom();
 //				new TriMeshDragonRoom();
 //				new UnionRoom();
 //				new cubeRandomRoom();
-				new CombineAllRoom();
+				new CombineAllRoom(rotX, rotY, rotZ);
 
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),

@@ -10,7 +10,7 @@ import xyz.marsavic.utils.Numeric;
 public class Box extends Solid {
 	
 	public static final BoxedObjectFactory.PQ<Box> $ = Box::new;
-	public static Box UNIT = Box.$.pq(Vec3.ZERO, Vec3.EXYZ);
+	public static Box UNIT = Box.$.pq(Vec3.EXYZ.mul(-0.5), Vec3.EXYZ.mul(0.5));
 	
 	
 	private final Vec3 p, q;

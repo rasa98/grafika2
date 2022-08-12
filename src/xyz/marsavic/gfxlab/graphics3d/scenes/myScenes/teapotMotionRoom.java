@@ -12,7 +12,8 @@ import java.util.*;
 public class teapotMotionRoom extends Scene.Base {
 
 	public teapotMotionRoom() {
-		addAllFrom(OpenRoomRGTextured_GI.room);
+//		addAllFrom(OpenRoomRGTextured_GI.room);
+		addAllFrom(LightBehindRoom.room);
 
 
 		Map<String, TriangleMesh> meshes = readTriMeshFromFile("resources/obj/teapot-high.obj", 5);

@@ -15,7 +15,8 @@ import java.util.Map;
 public class TriMeshDragonRoom extends Scene.Base {
 
 	public TriMeshDragonRoom() {
-		addAllFrom(OpenRoomRGTextured_GI.room);
+//		addAllFrom(OpenRoomRGTextured_GI.room);
+		addAllFrom(LightBehindRoom.room);
 
 		var meshes = readTriMeshFromFile("resources/obj/dragon.obj", 10);
 		for(TriangleMesh tm: meshes.values()){

@@ -1,6 +1,8 @@
 package xyz.marsavic.gfxlab.graphics3d.scenes.myScenes;
 
 
+
+import xyz.marsavic.gfxlab.Color;
 import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
 import xyz.marsavic.gfxlab.graphics3d.scenes.OpenRoomRGTextured_GI;
@@ -15,7 +17,8 @@ import java.util.Map;
 public class UnionRoom extends Scene.Base {
 
 	public UnionRoom() {
-		addAllFrom(OpenRoomRGTextured_GI.room);
+//		addAllFrom(OpenRoomRGTextured_GI.room);
+		addAllFrom(LightBehindRoom.room);
 
 		Solid sA = Box.$.r(0.5).transformed(Affine.rotationAboutX(0.1).andThen(Affine.rotationAboutY(0.1)));
 		Solid sB = Ball.cr(Vec3.xyz(0, 0, 0), 0.62);
@@ -36,7 +39,7 @@ public class UnionRoom extends Scene.Base {
 			set[i] = temp;
 		}
 		Solid uni = Solid.union(set).transformed(Affine.translation(Vec3.xyz(0.6, -0.5, -0.8)).andThen(Affine.rotationAboutZ(0.1)));
-		Body csg = Body.uniform(uni, Material.matte(0.95));
+		Body csg = Body.uniform(uni, Material.matte(Color.hsb(0.18, 1, 0.29)));
 		bodies.add(csg);
 
 		Collections.addAll(bodies);
