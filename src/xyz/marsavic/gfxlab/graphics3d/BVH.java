@@ -2,45 +2,53 @@ package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.graphics3d.solids.HalfSpace;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 
 public class BVH {
 
     private BoundingBox bbox;
-    private List<Body> bodies;
+    private Collection<Body> bodies;
 
     // Only root uses
-    public List<Body> outliers;
+    public Collection<Body> outliers;
     private BVH left, right;
 
 
-    private BVH(List<Body> bodies) {
+
+
+    private BVH(Collection<Body> bodies) {
         this.bodies = bodies;
     }
 
 
-    private BVH(BoundingBox bbox, List<Body> l) {
+    private BVH(BoundingBox bbox, Collection<Body> l) {
         this(l);
         this.bbox = bbox;
     }
 
 
-    public static BVH makeBVH(List<Body> bodies, int amount) {
-        BVH root = new BVH(new ArrayList<>()){};
+    public static BVH makeBVH(Collection<Body> bodies, int amount) {
+        BVH root = new BVH(new HashSet<>()){};
         BoundingBox localBBox = new BoundingBox();
 
-        List<Body> NoBBoxSolids = new ArrayList<>();
-        for(int i=bodies.size() - 1; i>=0; i--){
-            Body body = bodies.get(i);
+        Set<Body> NoBBoxSolids = new HashSet<>();
+
+        for(Iterator<Body> i = bodies.iterator(); i.hasNext();) {
+            Body body = i.next();
             Solid s = body.solid();
             if(s instanceof HalfSpace){
                 NoBBoxSolids.add(body);
-                bodies.remove(i);
+                i.remove();
             }
             else{
                 localBBox = localBBox.addBBox(s.bbox());
             }
         }
+
         root.bbox = localBBox;
         root.bodies = bodies;
         divideBVH(root, amount);
@@ -54,40 +62,45 @@ public class BVH {
         }
         BoundingBox leftHalf = bvh.bbox.getLeftHalf();
 
-        List<Body> leftBodies = new ArrayList<>();
-        List<Body> rightBodies = new ArrayList<>();
+        Set<Body> leftBodies = new HashSet<>();
+        Set<Body> rightBodies = new HashSet<>();
         BoundingBox left = new BoundingBox();
         BoundingBox right = new BoundingBox();
 
+        Set<Body> inMid = new HashSet<>();
 
-        for(int i=bvh.bodies.size() - 1; i>=0; i--){
-            Body b = bvh.bodies.get(i);
-            Solid s = b.solid();
-
+        for(Iterator<Body> i = bvh.bodies.iterator(); i.hasNext();) {
+            Body body = i.next();
+            Solid s = body.solid();
             BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
             switch (e){
                 case Full:
-                    leftBodies.add(b);
+                    leftBodies.add(body);
                     left = left.addBBox(s.bbox());
 
-                break;
+                    break;
                 case None:
-                    rightBodies.add(b);
+                    rightBodies.add(body);
                     right = right.addBBox(s.bbox());
-                break;
+                    break;
                 default:
-                    if(leftBodies.size() >= rightBodies.size()){
-                        rightBodies.add(b);
-                        right = right.addBBox(s.bbox());
-                    }
-                    else{
-                        leftBodies.add(b);
-                        left = left.addBBox(s.bbox());
-                    }
+                    inMid.add(body);
             }
-            bvh.bodies.remove(i);
+
+            i.remove();
         }
+        for(Body b: inMid){
+            if(leftBodies.size() >= rightBodies.size()){
+                rightBodies.add(b);
+                right = right.addBBox(b.solid().bbox());
+            }
+            else{
+                leftBodies.add(b);
+                left = left.addBBox(b.solid().bbox());
+            }
+        }
+
 
         bvh.left = new BVH(left, leftBodies);
         bvh.right = new BVH(right, rightBodies);
@@ -95,6 +108,7 @@ public class BVH {
         divideBVH(bvh.left, amount);
         divideBVH(bvh.right, amount);
     }
+
 
     public Collider.Collision getCollision(Ray ray, double epsilon) {
         Collider.Collision minC = null;
@@ -123,7 +137,7 @@ public class BVH {
         return minC;
     }
 
-    public Collider.Collision getBestCollision(Ray ray, double epsilon, List<Body> bodies, Collider.Collision minC){
+    public Collider.Collision getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, Collider.Collision minC){
         double minT = minC != null? minC.hit().t() : Double.MAX_VALUE;
         Body minBody = null;
         Hit minHit = null;

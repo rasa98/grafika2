@@ -1,9 +1,8 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
-import com.google.common.collect.Lists;
 import xyz.marsavic.gfxlab.graphics3d.*;
 
-import java.util.List;
+import java.util.*;
 
 
 public class TriangleMesh extends Solid {
@@ -12,10 +11,10 @@ public class TriangleMesh extends Solid {
 	private Solid[] tri;
 
 
-	public TriangleMesh(List<Triangle> l, int amount) {
+	public TriangleMesh(Collection<Solid> l, int amount) {
 		this.tri = l.toArray(new Triangle[0]);
 		bbox(calculateBBox());
-		bvh = BVHSolid.makeBVH(Lists.newArrayList(tri), amount);
+		bvh = BVHSolid.makeBVH(l, amount);
 	}
 
 	@Override

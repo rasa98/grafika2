@@ -2,41 +2,56 @@ package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.graphics3d.solids.HalfSpace;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 
 public class BVHSolid {
 
     private BoundingBox bbox;
-    private List<Solid> solids;
+    private Collection<Solid> solids;
 
     //Used only for root
-    public List<Solid> outliers;
+    public Collection<Solid> outliers;
     private BVHSolid left, right;
 
-    private BVHSolid(List<Solid> solids) {
+    private BVHSolid(Collection<Solid> solids) {
         this.solids = solids;
     }
 
-    private BVHSolid(BoundingBox bbox, List<Solid> rightSolids) {
+    private BVHSolid(BoundingBox bbox, Collection<Solid> rightSolids) {
         this(rightSolids);
         this.bbox = bbox;
     }
 
-    public static BVHSolid makeBVH(List<Solid> solids, int amount) {
-        BVHSolid root = new BVHSolid(new ArrayList<>());
+    public static BVHSolid makeBVH(Collection<Solid> solids, int amount) {
+        BVHSolid root = new BVHSolid(new HashSet<>());
         BoundingBox localBBox = new BoundingBox();
 
-        List<Solid> NoBBoxSolids = new ArrayList<>();
-        for(int i=solids.size() - 1; i>=0; i--){
-            Solid s = solids.get(i);
+        Set<Solid> NoBBoxSolids = new HashSet<>();
+//        for(int i=solids.size() - 1; i>=0; i--){
+//            Solid s = solids.get(i);
+//            if(s instanceof HalfSpace){
+//                NoBBoxSolids.add(s);
+//                solids.remove(i);
+//            }
+//            else{
+//                localBBox = localBBox.addBBox(s.bbox());
+//            }
+//        }
+        for(Iterator<Solid> i = solids.iterator(); i.hasNext();) {
+            Solid s = i.next();
             if(s instanceof HalfSpace){
                 NoBBoxSolids.add(s);
-                solids.remove(i);
+                i.remove();
             }
             else{
                 localBBox = localBBox.addBBox(s.bbox());
             }
         }
+
         root.bbox = localBBox;
         root.solids = solids;
         divideBVH(root, amount);
@@ -50,14 +65,15 @@ public class BVHSolid {
         }
         BoundingBox leftHalf = bvh.bbox.getLeftHalf();
 
-        List<Solid> leftSolids = new ArrayList<>();
-        List<Solid> rightSolids = new ArrayList<>();
+        Set<Solid> leftSolids = new HashSet<>();
+        Set<Solid> rightSolids = new HashSet<>();
         BoundingBox left = new BoundingBox();
         BoundingBox right = new BoundingBox();
 
-        for(int i = bvh.solids.size() - 1; i>=0; i--){
-            Solid s = bvh.solids.get(i);
+        Set<Solid> inMid = new HashSet<>();
 
+        for(Iterator<Solid> i = bvh.solids.iterator(); i.hasNext();) {
+            Solid s = i.next();
             BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
             switch (e){
@@ -71,17 +87,22 @@ public class BVHSolid {
                     right = right.addBBox(s.bbox());
                     break;
                 default:
-                    if(leftSolids.size() >= rightSolids.size()){
-                        rightSolids.add(s);
-                        right = right.addBBox(s.bbox());
-                    }
-                    else{
-                        leftSolids.add(s);
-                        left = left.addBBox(s.bbox());
-                    }
+                    inMid.add(s);
             }
-            bvh.solids.remove(i);
+
+            i.remove();
         }
+        for(Solid s: inMid){
+            if(leftSolids.size() >= rightSolids.size()){
+                rightSolids.add(s);
+                right = right.addBBox(s.bbox());
+            }
+            else{
+                leftSolids.add(s);
+                left = left.addBBox(s.bbox());
+            }
+        }
+
         bvh.left = new BVHSolid(left, leftSolids);
         bvh.right = new BVHSolid(right, rightSolids);
 

@@ -1,7 +1,6 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.Color;
-import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.solids.Triangle;
 import xyz.marsavic.gfxlab.graphics3d.solids.TriangleMesh;
 
@@ -20,8 +19,8 @@ public interface Scene {
 	
 	
 	public static class Base implements Scene {
-		protected List<Body> bodies = new ArrayList<>();
-		protected List<Light> lights = new ArrayList<>();
+		protected Set<Body> bodies = new HashSet<>();
+		protected Set<Light> lights = new HashSet<>();
 		protected Color backgroundColor = Color.BLACK;
 		
 		
@@ -42,11 +41,7 @@ public interface Scene {
 		
 		
 		public void addBodiesFrom(Scene other) {
-			//to do change fields -> list to set
-			Set<Body> temp = new HashSet<>();
-			temp.addAll(bodies);
-			temp.addAll(other.bodies());
-			bodies = new ArrayList<>(temp);
+			bodies.addAll(other.bodies());
 		}
 		
 		public void addLightsFrom(Scene other) {
@@ -62,7 +57,7 @@ public interface Scene {
 			Map<String, TriangleMesh> objMeshes = new HashMap<>();
 			try {
 				InputStream is = new FileInputStream(filename);
-				Map<String, List<Triangle>> nameToTriangles = Parser.getTriMeshes(is);
+				Map<String, Collection<Solid>> nameToTriangles = Parser.getTriMeshes(is);
 				for(var entry: nameToTriangles.entrySet()){
 					objMeshes.put(entry.getKey(), new TriangleMesh(entry.getValue(), amount));
 				}

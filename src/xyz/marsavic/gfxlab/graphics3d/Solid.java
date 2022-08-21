@@ -5,6 +5,7 @@ import xyz.marsavic.gfxlab.Vec3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
@@ -98,7 +99,7 @@ public abstract class Solid {
 
     abstract static class CsgSolid extends Solid {
 
-        private BVHSolid bvh = BVHSolid.makeBVH(Lists.newArrayList(children()), 3);
+        private BVHSolid bvh = BVHSolid.makeBVH(new HashSet<>(Arrays.asList(children())), 3);
 
         abstract Solid[] children();
 

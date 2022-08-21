@@ -10,7 +10,7 @@ import java.util.*;
 public class Parser {
     List<Vec3> vertices;
     List<Vec3> vertNormals;
-    Map<String, List<Triangle>> groups;
+    Map<String, Collection<Solid>> groups;
 
     String lastGroup;
 
@@ -21,7 +21,7 @@ public class Parser {
         parseObjFile(file);
     }
 
-    public static Map<String, List<Triangle>> getTriMeshes(InputStream file){
+    public static Map<String, Collection<Solid>> getTriMeshes(InputStream file){
         Parser p = new Parser(file);
         return p.groups;
     }
@@ -35,18 +35,18 @@ public class Parser {
     private void addTriangle(int a, int b, int c){
         if(lastGroup == null)
             addGroup("default");
-        List<Triangle> l= groups.get(lastGroup);
+        Collection<Solid> l= groups.get(lastGroup);
         l.add(Triangle.p123(vertices.get(a-1), vertices.get(b-1), vertices.get(c-1)));
     }
     private void addSmoothTriangle(int a, int b, int c, int na, int nb, int nc){
         if(lastGroup == null)
             addGroup("defaultSmooth");
-        List<Triangle> l= groups.get(lastGroup);
+        Collection<Solid> l= groups.get(lastGroup);
         l.add(SmoothTriangle.p123(vertices.get(a-1), vertices.get(b-1), vertices.get(c-1),
                                   vertNormals.get(na - 1), vertNormals.get(nb - 1), vertNormals.get(nc - 1)));
     }
     private void addGroup(String s){
-        List<Triangle> l = new ArrayList<>();
+        Collection<Solid> l = new HashSet<>();
         lastGroup = s;
         groups.put(s, l);
     }
