@@ -105,6 +105,9 @@ public class BVH {
         bvh.left = new BVH(left, leftBodies);
         bvh.right = new BVH(right, rightBodies);
 
+        // jvm no tail recursion
+        leftHalf = null;leftBodies = null;rightBodies = null;left = null;right = null;inMid = null;
+
         divideBVH(bvh.left, amount);
         divideBVH(bvh.right, amount);
     }

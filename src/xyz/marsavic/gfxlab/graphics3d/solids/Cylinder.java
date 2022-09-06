@@ -29,7 +29,7 @@ public class Cylinder extends Solid {
 		lower = c.y() - h2;
 		rSqr = r * r;
 
-		bbox(calculateBBox());
+		//		bbox();
 	}
 
 

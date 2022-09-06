@@ -24,7 +24,7 @@ public class Torus extends Solid {
 		this.A = A;
 		this.r = r;
 
-		bbox(calculateBBox());
+		//		bbox();
 	}
 
 

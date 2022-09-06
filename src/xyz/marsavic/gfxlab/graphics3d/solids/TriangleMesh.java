@@ -13,7 +13,7 @@ public class TriangleMesh extends Solid {
 
 	public TriangleMesh(Collection<Solid> l, int amount) {
 		this.tri = l.toArray(new Triangle[0]);
-		bbox(calculateBBox());
+//				bbox();
 		bvh = BVHSolid.makeBVH(l, amount);
 	}
 

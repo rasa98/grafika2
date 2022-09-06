@@ -22,7 +22,7 @@ public class TorusRoom extends Scene.Base {
 						.andThen(Affine.rotationAboutX(0.25 + rotX)
 						.andThen(Affine.rotationAboutY(0.324 + rotY))
 						.andThen(Affine.rotationAboutZ(0.35 + rotZ))
-						.andThen(Affine.translation(Vec3.xyz(0.5, -0.52, 7.8))))), Material.matte(0.).emittance(Color.rgb(0., 1, 0.4)))
+						.andThen(Affine.translation(Vec3.xyz(0.5, -0.52, 4.8))))), Material.matte(0.).emittance(Color.rgb(0., 1, 0.4)))
 
 		);
 	}

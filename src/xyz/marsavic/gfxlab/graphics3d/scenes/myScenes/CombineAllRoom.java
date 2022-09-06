@@ -21,6 +21,6 @@ public class CombineAllRoom extends Scene.Base {
 		addAllFrom(new UnionRoom());
 		addAllFrom(new ConeRoom());
 //		addAllFrom(new TorusRoom(rotX, rotY, rotZ));
-		System.out.println("All bodies: "+bodies.size());
+		System.out.println("Number of bodies in scene: "+bodies.size());
 	}
 }

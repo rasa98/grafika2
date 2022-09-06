@@ -20,7 +20,7 @@ public class Box extends Solid {
 		this.p = p;
 		this.q = q;
 
-		bbox(calculateBBox());
+		//		bbox();
 	}
 	
 

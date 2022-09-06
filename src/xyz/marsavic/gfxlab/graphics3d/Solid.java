@@ -1,36 +1,31 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
-import com.google.common.collect.Lists;
 import xyz.marsavic.gfxlab.Vec3;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 public abstract class Solid {
     private BoundingBox bbox;
 
+    public BoundingBox bbox() {
+        if(bbox == null)
+            bbox = calculateBBox();
+        return bbox;
+    }
+
     protected abstract BoundingBox calculateBBox();
 
     public Hit firstHit(Ray ray, double afterTime){
         return firstHit(ray, afterTime);
-    };
-
-    public BoundingBox bbox(){
-        return bbox;
     }
-
-    public void bbox(BoundingBox bbox){ this.bbox = bbox; }
-
 
     public Solid transformed(Affine t) {
         Solid res = new Solid() {
             private final Affine tInv = t.inverse();
             private final Affine tInvTransposed = tInv.transposeWithoutTranslation();
-
 
 
             @Override
@@ -45,7 +40,7 @@ public abstract class Solid {
 
             @Override
             protected BoundingBox calculateBBox() {
-                BoundingBox bb = Solid.this.bbox;
+                BoundingBox bb = Solid.this.bbox();
                 BoundingBox bbNew = new BoundingBox();
 
                 Vec3[] corners = bb.box.getCorners();
@@ -56,7 +51,6 @@ public abstract class Solid {
                 return bbNew;
             }
         };
-        res.bbox(res.calculateBBox());
         return res;
     }
 
@@ -81,7 +75,7 @@ public abstract class Solid {
                 Affine start = affineF.apply(0.);
                 Affine end = affineF.apply(1.);
 
-                BoundingBox bb = Solid.this.bbox;
+                BoundingBox bb = Solid.this.bbox();
                 BoundingBox bbNew = new BoundingBox();
 
                 Vec3[] corners = bb.box.getCorners();
@@ -93,7 +87,6 @@ public abstract class Solid {
                 return bbNew;
             }
         };
-        res.bbox(res.calculateBBox());
         return res;
     }
 
@@ -112,7 +105,7 @@ public abstract class Solid {
 			BoundingBox bbox = new BoundingBox();
 
 			for( Solid c : children()){
-				bbox = bbox.addBBox(c.bbox());
+				bbox = bbox.addBBox(c.calculateBBox());
 			}
 			return bbox;
 		}
@@ -186,7 +179,6 @@ public abstract class Solid {
                     return null;
                 }
             };
-        s.bbox(s.calculateBBox());
         return s;
     }
 
@@ -257,7 +249,6 @@ public abstract class Solid {
                 return null;
             }
         };
-        s.bbox(s.calculateBBox());
         return s;
     }
 
@@ -326,7 +317,6 @@ public abstract class Solid {
                 return null;
             }
         };
-        s.bbox(s.calculateBBox());
         return s;
     }
 }

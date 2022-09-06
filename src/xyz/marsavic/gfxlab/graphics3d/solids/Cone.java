@@ -42,7 +42,7 @@ public class Cone extends Solid {
 		rSqr = r * r;
 		k = r / h;
 
-		bbox(calculateBBox());
+		//		bbox();
 	}
 
 

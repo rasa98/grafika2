@@ -27,7 +27,7 @@ public class Triangle extends Solid {
 		e2 = p3.sub(p1);
 		n = e1.cross(e2);
 
-		bbox(calculateBBox());
+		//		bbox();
 	}
 	
 	

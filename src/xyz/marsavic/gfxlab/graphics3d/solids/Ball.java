@@ -23,7 +23,7 @@ public class Ball extends Solid {
 		this.r = r;
 		rSqr = r * r;
 
-		bbox(calculateBBox());
+//		bbox();
 	}
 	
 	
