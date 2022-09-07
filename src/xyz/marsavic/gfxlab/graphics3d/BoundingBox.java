@@ -4,8 +4,8 @@ import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.solids.Box;
 
 public class BoundingBox {
-//    private Vec3 min;
-//    private Vec3 max;
+
+    public static final BoundingBox OUTLIER = new BoundingBox();
 
     public final Box box;
 
@@ -71,10 +71,12 @@ public class BoundingBox {
 
 
     public enum hasBBox {
-        Full, half, None
+        Full, half, None, Outlier
     }
 
     public hasBBox hasBBox(BoundingBox bb){
+        if(bb == OUTLIER)
+            return hasBBox.Outlier;
         boolean hasP = hasPoint(bb.box.p());
         boolean hasQ = hasPoint(bb.box.q());
         if (hasP && hasQ)

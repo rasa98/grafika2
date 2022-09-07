@@ -96,12 +96,8 @@ public class HalfSpace extends Solid {
 
 	@Override
 	protected BoundingBox calculateBBox() {
-		// nzm dal je uredu....cisto da ima ..
-		//return new BoundingBox();
-
-//		return new BoundingBox(Vec3.xyz(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE),
-//				Vec3.xyz(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE));
-		throw new RuntimeException("class HalfSpace doesnt have BoundingBox");
+//		throw new RuntimeException("class HalfSpace doesnt have BoundingBox");
+		return BoundingBox.OUTLIER;
 	}
 
 

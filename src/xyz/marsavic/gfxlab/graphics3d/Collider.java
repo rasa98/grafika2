@@ -101,8 +101,9 @@ public interface Collider {
 
 		@Override
 		public Collision collide(Ray r, double t) {
-			Collision c = root.getCollision(r, EPSILON);
-			return root.getBestCollision(r, EPSILON, root.outliers, c);
+//			Collision c = root.getCollision(r, EPSILON);
+//			return root.getBestCollision(r, EPSILON, root.outliers, c);
+			return root.getCollision(r, EPSILON);
 
 
 //			Hit minHit = null;

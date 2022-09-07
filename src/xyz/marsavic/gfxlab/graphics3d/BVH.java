@@ -1,6 +1,5 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
-import xyz.marsavic.gfxlab.graphics3d.solids.HalfSpace;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,12 +12,7 @@ public class BVH {
 
     private BoundingBox bbox;
     private Collection<Body> bodies;
-
-    // Only root uses
-    public Collection<Body> outliers;
     private BVH left, right;
-
-
 
 
     private BVH(Collection<Body> bodies) {
@@ -36,24 +30,15 @@ public class BVH {
         BVH root = new BVH(new HashSet<>()){};
         BoundingBox localBBox = new BoundingBox();
 
-        Set<Body> NoBBoxSolids = new HashSet<>();
-
         for(Iterator<Body> i = bodies.iterator(); i.hasNext();) {
             Body body = i.next();
             Solid s = body.solid();
-            if(s instanceof HalfSpace){
-                NoBBoxSolids.add(body);
-                i.remove();
-            }
-            else{
-                localBBox = localBBox.addBBox(s.bbox());
-            }
+            localBBox = localBBox.addBBox(s.bbox());
         }
 
         root.bbox = localBBox;
         root.bodies = bodies;
         divideBVH(root, amount);
-        root.outliers = NoBBoxSolids;
         return root;
     }
 
@@ -79,14 +64,16 @@ public class BVH {
                 case Full:
                     leftBodies.add(body);
                     left = left.addBBox(s.bbox());
-
                     break;
                 case None:
                     rightBodies.add(body);
                     right = right.addBBox(s.bbox());
                     break;
-                default:
+                case half:
                     inMid.add(body);
+                    break;
+                default: // outlier
+                    continue;
             }
 
             i.remove();
@@ -107,7 +94,8 @@ public class BVH {
         bvh.right = new BVH(right, rightBodies);
 
         // jvm no tail recursion
-        leftHalf = null;leftBodies = null;rightBodies = null;left = null;right = null;inMid = null;
+        leftHalf = null;leftBodies = null;rightBodies = null;
+        left = null;right = null;inMid = null;
 
         divideBVH(bvh.left, amount);
         divideBVH(bvh.right, amount);
