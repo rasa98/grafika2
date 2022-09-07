@@ -77,12 +77,12 @@ public class BVHSolid {
             BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
             switch (e){
-                case Full:
+                case FULL:
                     leftSolids.add(s);
                     left = left.addBBox(s.bbox());
 
                     break;
-                case None:
+                case NONE:
                     rightSolids.add(s);
                     right = right.addBBox(s.bbox());
                     break;

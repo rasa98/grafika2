@@ -61,15 +61,15 @@ public class BVH {
             BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
             switch (e){
-                case Full:
+                case FULL:
                     leftBodies.add(body);
                     left = left.addBBox(s.bbox());
                     break;
-                case None:
+                case NONE:
                     rightBodies.add(body);
                     right = right.addBBox(s.bbox());
                     break;
-                case half:
+                case HALF:
                     inMid.add(body);
                     break;
                 default: // outlier

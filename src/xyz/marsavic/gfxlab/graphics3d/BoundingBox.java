@@ -71,19 +71,19 @@ public class BoundingBox {
 
 
     public enum hasBBox {
-        Full, half, None, Outlier
+        FULL, HALF, NONE, OUTLIER
     }
 
     public hasBBox hasBBox(BoundingBox bb){
         if(bb == OUTLIER)
-            return hasBBox.Outlier;
+            return hasBBox.OUTLIER;
         boolean hasP = hasPoint(bb.box.p());
         boolean hasQ = hasPoint(bb.box.q());
         if (hasP && hasQ)
-            return hasBBox.Full;
+            return hasBBox.FULL;
         else if(hasP || hasQ)
-            return hasBBox.half;
-        return hasBBox.None;
+            return hasBBox.HALF;
+        return hasBBox.NONE;
     }
 
     public boolean rayHitsBox(Ray ray, double afterTime){
