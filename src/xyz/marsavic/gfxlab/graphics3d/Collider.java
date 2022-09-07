@@ -1,6 +1,8 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 
+import xyz.marsavic.gfxlab.Vec3;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -25,9 +27,13 @@ public interface Collider {
 	}
 
 
-	public static record Collision  (
+	record Collision  (
 			Hit hit, Body body
-	) {}
+	) {
+		public static Collision empty(){
+			return new Collision(new Hit.Data(Double.MAX_VALUE, null), null);
+		}
+	}
 	
 	
 	

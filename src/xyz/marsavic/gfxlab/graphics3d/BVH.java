@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import static xyz.marsavic.gfxlab.graphics3d.Collider.Collision;
 
 
 public class BVH {
@@ -112,51 +113,65 @@ public class BVH {
         divideBVH(bvh.right, amount);
     }
 
+    private class BestCol{
+        Collision c;
 
-    public Collider.Collision getCollision(Ray ray, double epsilon) {
-        Collider.Collision minC = null;
-        if(bbox.rayHitsBox(ray, epsilon)){
-            double minT = Double.MAX_VALUE;
-            minC = getBestCollision(ray, epsilon, bodies, null);
-            if(left != null){
-                Collider.Collision leftC = left.getCollision(ray, epsilon);
-                Collider.Collision rightC = right.getCollision(ray, epsilon);
+        BestCol(){ this.c = Collision.empty();}
 
-                if(leftC != null){
-                    double t = leftC.hit().t();
-                    if(t > 0 && t < minT){
-                        minT = t;
-                        minC = leftC;
-                    }
-                }
-                if(rightC != null){
-                    double t = rightC.hit().t();
-                    if(t > 0 && t < minT){
-                        minC = rightC;
-                    }
+        BestCol(Collision c){ this.c = c; }
+
+        void best(Collision... cs){
+            for(Collision c : cs) {
+                if (c == null)
+                    continue;
+
+                double t = c.hit().t();
+
+                if (t > 0 && t < this.c.hit().t()) {
+                    this.c = c;
                 }
             }
         }
-        return minC;
+
+        void best(Body b, Hit h){
+            if(h == null || b == null)
+                return;
+
+            double t = h.t();
+
+            if(t > 0 && t < this.c.hit().t()){
+                this.c = new Collision(h, b);
+            }
+        }
     }
 
-    public Collider.Collision getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, Collider.Collision minC){
-        double minT = minC != null? minC.hit().t() : Double.MAX_VALUE;
-        Body minBody = null;
-        Hit minHit = null;
+    public Collision getCollision(Ray ray, double epsilon) {
+        BestCol minC = new BestCol();
+        if(bbox.rayHitsBox(ray, epsilon)){
+            getBestCollision(ray, epsilon, bodies, minC);
+            if(left != null){
+                Collision leftC = left.getCollision(ray, epsilon);
+                Collision rightC = right.getCollision(ray, epsilon);
+
+                minC.best(leftC, rightC);
+            }
+        }
+        return minC.c;
+    }
+
+    public void getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, BestCol minC){
         for(Body body: bodies) {
             Solid s = body.solid();
             Hit hit = s.firstHit(ray, epsilon);
-            if(hit != null){
-                double hitT = hit.t();
-                if(hitT > 0 && hitT < minT){
-                    minT = hitT;
-                    minBody = body;
-                    minHit = hit;
-                }
-            }
+            minC.best(body, hit);
         }
-        return minBody != null ? new Collider.Collision(minHit , minBody) : minC;
+    }
+
+
+    public Collision getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, Collision minC){
+        BestCol bestC = new BestCol(minC);
+        getBestCollision(ray, epsilon, bodies, bestC);
+        return bestC.c;
     }
 
 
