@@ -1,7 +1,11 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 
-import xyz.marsavic.gfxlab.graphics3d.BVH.BVH;
+
+
+
+import xyz.marsavic.gfxlab.graphics3d.BVH.BVHFactory;
+import xyz.marsavic.gfxlab.graphics3d.BVH.BVHFactory.BVH;
 
 import java.util.Collection;
 
@@ -89,7 +93,7 @@ public interface Collider {
 
 
 		public BvhCollider(Collection<Body> bodies) {
-			this.root = BVH.makeBVH(bodies, 3);
+			this.root = BVHFactory.makeBVH(bodies, 3);
 		}
 
 
