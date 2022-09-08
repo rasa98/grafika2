@@ -57,7 +57,7 @@ public abstract class MyItr<T> implements Iterator<Solid> {
         public Solid next() {
             Solid s = it.next();
             setE(s);
-            return getE();
+            return s;
         }
     }
 }
