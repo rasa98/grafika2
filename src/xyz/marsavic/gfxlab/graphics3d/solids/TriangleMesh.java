@@ -1,25 +1,26 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
 import xyz.marsavic.gfxlab.graphics3d.*;
+import xyz.marsavic.gfxlab.graphics3d.BVH.BVHFactory;
 
 import java.util.*;
 
 
 public class TriangleMesh extends Solid {
 
-	private BVHSolid bvh;
+	private BVHFactory.BVH bvh;
 	private Solid[] tri;
 
 
 	public TriangleMesh(Collection<Solid> l, int amount) {
 		this.tri = l.toArray(new Triangle[0]);
 //				bbox();
-		bvh = BVHSolid.makeBVH(l, amount);
+		bvh = BVHFactory.makeBVHSolid(l, amount);//BVHSolid.makeBVH(l, amount);
 	}
 
 	@Override
 	public Triangle.HitTriangle firstHit(Ray ray, double afterTime) {
-		return (Triangle.HitTriangle) bvh.getHit(ray, afterTime);
+		return (Triangle.HitTriangle) bvh.getCollision(ray, afterTime);
 	}
 
 	@Override

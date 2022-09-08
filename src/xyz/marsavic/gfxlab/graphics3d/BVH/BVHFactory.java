@@ -7,30 +7,35 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static xyz.marsavic.gfxlab.graphics3d.Collider.Collision;
 
 
-public class BVHFactory<T> {
+public class BVHFactory<T, S> {
 
     private final int amount;
+
     private final BVH bvh;
 
     private final Function<Collection<T>, Wrap<T>> wrapperFactory ;// Foo::new;
 
+    private final Supplier<BestColOrHit<S, T>> chFactory;
 
-    private BVHFactory(Collection<T> bodies, Function<Collection<T>, Wrap<T>> wrapperFactory, int amount) {
+
+    private BVHFactory(Collection<T> bodies, Function<Collection<T>, Wrap<T>> wrapperFactory, int amount, Supplier<BestColOrHit<S, T>> chFactory) {
         this.amount = amount;
         this.wrapperFactory = wrapperFactory;
+        this.chFactory = chFactory;
         bvh = new BVH(bodies);
     }
 
-    public static BVHFactory<Body>.BVH makeBVHBody(Collection<Body> bodies, int amount) {
-        return new BVHFactory<>(bodies, Wrap.BodyCol::new, amount).bvh;
+    public static BVHFactory<Body, Collision>.BVH makeBVHBody(Collection<Body> bodies, int amount) {
+        return new BVHFactory<>(bodies, Wrap.BodyCol::new, amount, BestColOrHit.BestCol::new).bvh;
     }
 
-    public static BVHFactory<Solid>.BVH makeBVHSolid(Collection<Solid> bodies, int amount) {
-        return new BVHFactory<>(bodies, Wrap.SolidCol::new, amount).bvh;
+    public static BVHFactory<Solid, Hit>.BVH makeBVHSolid(Collection<Solid> bodies, int amount) {
+        return new BVHFactory<>(bodies, Wrap.SolidCol::new, amount, BestColOrHit.BestHit::new).bvh;
     }
 
 
@@ -104,57 +109,25 @@ public class BVHFactory<T> {
             right = new BVH(rightBodies);
         }
 
-        private class BestCol{
-            Collision c;
-
-            BestCol(){ this.c = Collision.empty();}
-
-            BestCol(Collision c){ this.c = c; }
-
-            void best(Collision... cs){
-                for(Collision c : cs) {
-                    if (c == null)
-                        continue;
-
-                    double t = c.hit().t();
-
-                    if (t > 0 && t < this.c.hit().t()) {
-                        this.c = c;
-                    }
-                }
-            }
-
-            void best(Body b, Hit h){
-                if(h == null || b == null)
-                    return;
-
-                double t = h.t();
-
-                if(t > 0 && t < this.c.hit().t()){
-                    this.c = new Collision(h, b);
-                }
-            }
-        }
-
-        public Collision getCollision(Ray ray, double epsilon) {
-            BestCol minC = new BestCol();
+        public S getCollision(Ray ray, double epsilon) {
+            BestColOrHit<S, T> minC = chFactory.get();
             if(bbox.rayHitsBox(ray, epsilon)){
                 getBestCollision(ray, epsilon, wraper, minC);
                 if(left != null){
-                    Collision leftC = left.getCollision(ray, epsilon);
-                    Collision rightC = right.getCollision(ray, epsilon);
+                    S leftC = left.getCollision(ray, epsilon);
+                    S rightC = right.getCollision(ray, epsilon);
 
                     minC.best(leftC, rightC);
                 }
             }
-            return minC.c;
+            return minC.getCH();
         }
 
-        private void getBestCollision(Ray ray, double epsilon, Wrap<T> wrapper, BestCol minC){
+        private void getBestCollision(Ray ray, double epsilon, Wrap<T> wrapper, BestColOrHit<S, T> minC){
             for(MyItr<T> i = wrapper.iterator(); i.hasNext();) {
                 Solid s = i.next();
                 Hit hit = s.firstHit(ray, epsilon);
-                minC.best((Body) i.getE(), hit);
+                minC.best(i.getE(), hit);
             }
         }
 

@@ -33,9 +33,7 @@ public interface Collider {
 	record Collision  (
 			Hit hit, Body body
 	) {
-		public static Collision empty(){
-			return new Collision(new Hit.Data(Double.MAX_VALUE, null), null);
-		}
+		public static Collision EMPTY = new Collision(new Hit.Data(Double.MAX_VALUE, null), null);
 	}
 	
 	
@@ -106,7 +104,7 @@ public interface Collider {
 		public Collision collide(Ray r, double t) {
 //			Collision c = root.getCollision(r, EPSILON);
 //			return root.getBestCollision(r, EPSILON, root.outliers, c);
-			return root.getCollision(r, EPSILON);
+			return (Collision) root.getCollision(r, EPSILON);
 
 
 //			Hit minHit = null;
