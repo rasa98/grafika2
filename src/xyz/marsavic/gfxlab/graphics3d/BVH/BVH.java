@@ -1,5 +1,7 @@
-package xyz.marsavic.gfxlab.graphics3d;
+package xyz.marsavic.gfxlab.graphics3d.BVH;
 
+
+import xyz.marsavic.gfxlab.graphics3d.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,8 +27,13 @@ public class BVH {
         this.bbox = bbox;
     }
 
-
     public static BVH makeBVH(Collection<Body> bodies, int amount) {
+
+        return createBVH(bodies, amount);
+    }
+
+
+    public static BVH createBVH(Collection<Body> bodies, int amount) {
         BVH root = new BVH(new HashSet<>()){};
         BoundingBox localBBox = new BoundingBox();
 

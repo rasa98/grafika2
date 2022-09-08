@@ -1,10 +1,9 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 
-import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.BVH.BVH;
 
 import java.util.Collection;
-import java.util.List;
 
 
 public interface Collider {
