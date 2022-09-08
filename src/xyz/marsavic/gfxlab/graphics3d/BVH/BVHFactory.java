@@ -68,8 +68,8 @@ public class BVHFactory<T, S> {
             }
             BoundingBox leftHalf = bbox.getLeftHalf();
 
-            Collection<T> leftBodies = new HashSet<>();
-            Collection<T> rightBodies = new HashSet<>();
+            Set<T> leftBodies = new HashSet<>();
+            Set<T> rightBodies = new HashSet<>();
 
             Set<T> inMid = new HashSet<>();
 
@@ -104,31 +104,45 @@ public class BVHFactory<T, S> {
                 }
             }
 
-
             left = new BVH(leftBodies);
             right = new BVH(rightBodies);
         }
 
-        public S getCollision(Ray ray, double epsilon) {
-            BestColOrHit<S, T> minC = chFactory.get();
+        public S getColOrHit(Ray ray, double epsilon) {
+            BestColOrHit<S, T> bestCorH = chFactory.get();
             if(bbox.rayHitsBox(ray, epsilon)){
-                getBestCollision(ray, epsilon, wraper, minC);
+                getBestColOrHit(ray, epsilon, wraper, bestCorH);
                 if(left != null){
-                    S leftC = left.getCollision(ray, epsilon);
-                    S rightC = right.getCollision(ray, epsilon);
+                    S leftC = left.getColOrHit(ray, epsilon);
+                    S rightC = right.getColOrHit(ray, epsilon);
 
-                    minC.best(leftC, rightC);
+                    bestCorH.best(leftC, rightC);
                 }
             }
-            return minC.getCH();
+            return bestCorH.getCH();
         }
 
-        private void getBestCollision(Ray ray, double epsilon, Wrap<T> wrapper, BestColOrHit<S, T> minC){
+        private void getBestColOrHit(Ray ray, double epsilon, Wrap<T> wrapper, BestColOrHit<S, T> bestCorH){
             for(MyItr<T> i = wrapper.iterator(); i.hasNext();) {
                 Solid s = i.next();
                 Hit hit = s.firstHit(ray, epsilon);
-                minC.best(i.getE(), hit);
+                bestCorH.best(i.getE(), hit);
             }
+        }
+
+
+        public boolean getAnyColOrHit(Ray ray, double epsilon) {
+            if(bbox.rayHitsBox(ray, epsilon)){
+                for (Solid s : wraper) {
+                    Hit hit = s.firstHit(ray, epsilon);
+                    if (hit != null)
+                        return true;
+                }
+                if(left != null){
+                    return left.getAnyColOrHit(ray, epsilon) || right.getAnyColOrHit(ray, epsilon);
+                }
+            }
+            return false;
         }
 
 

@@ -20,7 +20,7 @@ public class TriangleMesh extends Solid {
 
 	@Override
 	public Triangle.HitTriangle firstHit(Ray ray, double afterTime) {
-		return (Triangle.HitTriangle) bvh.getCollision(ray, afterTime);
+		return (Triangle.HitTriangle) bvh.getColOrHit(ray, afterTime);
 	}
 
 	@Override

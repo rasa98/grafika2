@@ -19,9 +19,7 @@ public abstract class Solid {
 
     protected abstract BoundingBox calculateBBox();
 
-    public Hit firstHit(Ray ray, double afterTime){
-        return firstHit(ray, afterTime);
-    }
+    public abstract Hit firstHit(Ray ray, double afterTime);
 
     public Solid transformed(Affine t) {
         Solid res = new Solid() {
@@ -98,7 +96,7 @@ public abstract class Solid {
         abstract Solid[] children();
 
         public Boolean ifBoxHit(Ray ray, double afterTime){
-            return bvh.getCollision(ray, afterTime) != null;
+            return bvh.getAnyColOrHit(ray, afterTime);//bvh.getColOrHit(ray, afterTime) != null;
         }
 
 		@Override

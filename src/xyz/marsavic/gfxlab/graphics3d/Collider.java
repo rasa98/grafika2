@@ -104,7 +104,7 @@ public interface Collider {
 		public Collision collide(Ray r, double t) {
 //			Collision c = root.getCollision(r, EPSILON);
 //			return root.getBestCollision(r, EPSILON, root.outliers, c);
-			return (Collision) root.getCollision(r, EPSILON);
+			return (Collision) root.getColOrHit(r, EPSILON);
 
 
 //			Hit minHit = null;
