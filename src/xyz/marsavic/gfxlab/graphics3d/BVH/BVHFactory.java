@@ -5,38 +5,43 @@ import xyz.marsavic.gfxlab.graphics3d.*;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Function;
+
 import static xyz.marsavic.gfxlab.graphics3d.Collider.Collision;
 
 
-public class BVHFactory {
+public class BVHFactory<T> {
 
-    private int amount;
-    private BVH bvh;
+    private final int amount;
+    private final BVH bvh;
+
+    private final Function<Collection<T>, Wrap<T>> wrapperFactory ;// Foo::new;
 
 
-    private BVHFactory(Collection<Body> bodies, int amount) {
+    private BVHFactory(Collection<T> bodies, Function<Collection<T>, Wrap<T>> wrapperFactory, int amount) {
         this.amount = amount;
+        this.wrapperFactory = wrapperFactory;
         bvh = new BVH(bodies);
     }
 
-    public static BVH makeBVH(Collection<Body> bodies, int amount) {
-        return new BVHFactory(bodies, amount).bvh;
+    public static BVHFactory<Body>.BVH makeBVHBody(Collection<Body> bodies, int amount) {
+        return new BVHFactory<>(bodies, Wrap.BodyCol::new, amount).bvh;
     }
 
-//    public Collision getCollision(Ray ray, double epsilon) {
-//        return bvh.getCollision(ray, epsilon);
-//    }
+    public static BVHFactory<Solid>.BVH makeBVHSolid(Collection<Solid> bodies, int amount) {
+        return new BVHFactory<>(bodies, Wrap.SolidCol::new, amount).bvh;
+    }
+
 
     public class BVH {
         private BoundingBox bbox;
-        private Collection<Body> bodies;
+        private final Wrap<T> wraper;
         private BVH left, right;
 
 
-        private BVH(Collection<Body> bodies) {
-            this.bodies = bodies;
+        private BVH(Collection<T> col) {
+            this.wraper = wrapperFactory.apply(col);
             calculateBbox();
             divideBVH(amount);
         }
@@ -45,9 +50,7 @@ public class BVHFactory {
         private void calculateBbox() {
             BoundingBox localBBox = new BoundingBox();
 
-            for(Iterator<Body> i = bodies.iterator(); i.hasNext();) {
-                Body body = i.next();
-                Solid s = body.solid();
+            for (Solid s : wraper) {
                 localBBox = localBBox.addBBox(s.bbox());
             }
 
@@ -55,19 +58,20 @@ public class BVHFactory {
         }
 
         private void divideBVH(int amount) {
-            if(bodies.size() < amount){
+            if(wraper.col.size() < amount){
                 return;
             }
             BoundingBox leftHalf = bbox.getLeftHalf();
 
-            Set<Body> leftBodies = new HashSet<>();
-            Set<Body> rightBodies = new HashSet<>();
+            Collection<T> leftBodies = new HashSet<>();
+            Collection<T> rightBodies = new HashSet<>();
 
-            Set<Body> inMid = new HashSet<>();
+            Set<T> inMid = new HashSet<>();
 
-            for(Iterator<Body> i = bodies.iterator(); i.hasNext();) {
-                Body body = i.next();
-                Solid s = body.solid();
+            for(MyItr<T> i = wraper.iterator(); i.hasNext();) {
+                Solid s = i.next();
+                T body = i.getE();
+
                 BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
                 switch (e){
@@ -86,7 +90,7 @@ public class BVHFactory {
 
                 i.remove();
             }
-            for(Body b: inMid){
+            for(T b: inMid){
                 if(leftBodies.size() >= rightBodies.size()){
                     rightBodies.add(b);
                 }
@@ -135,7 +139,7 @@ public class BVHFactory {
         public Collision getCollision(Ray ray, double epsilon) {
             BestCol minC = new BestCol();
             if(bbox.rayHitsBox(ray, epsilon)){
-                getBestCollision(ray, epsilon, bodies, minC);
+                getBestCollision(ray, epsilon, wraper, minC);
                 if(left != null){
                     Collision leftC = left.getCollision(ray, epsilon);
                     Collision rightC = right.getCollision(ray, epsilon);
@@ -146,20 +150,13 @@ public class BVHFactory {
             return minC.c;
         }
 
-        private void getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, BestCol minC){
-            for(Body body: bodies) {
-                Solid s = body.solid();
+        private void getBestCollision(Ray ray, double epsilon, Wrap<T> wrapper, BestCol minC){
+            for(MyItr<T> i = wrapper.iterator(); i.hasNext();) {
+                Solid s = i.next();
                 Hit hit = s.firstHit(ray, epsilon);
-                minC.best(body, hit);
+                minC.best((Body) i.getE(), hit);
             }
         }
-
-
-//        public Collision getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, Collision minC){
-//            BestCol bestC = new BestCol(minC);
-//            getBestCollision(ray, epsilon, bodies, bestC);
-//            return bestC.c;
-//        }
 
 
         public boolean getCollisionIn01(Ray r, double epsilon) {

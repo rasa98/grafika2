@@ -93,7 +93,7 @@ public interface Collider {
 
 
 		public BvhCollider(Collection<Body> bodies) {
-			this.root = BVHFactory.makeBVH(bodies, 3);
+			this.root = BVHFactory.makeBVHBody(bodies, 3);
 		}
 
 
