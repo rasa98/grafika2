@@ -75,7 +75,7 @@ public class BVHFactory<T, S> {
 
             for(MyItr<T> i = wrapper.iterator(); i.hasNext();) {
                 Solid s = i.next();
-                T body = i.getE();
+                T body = i.get();
 
                 BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
@@ -126,7 +126,7 @@ public class BVHFactory<T, S> {
             for(MyItr<T> i = wrapper.iterator(); i.hasNext();) {
                 Solid s = i.next();
                 Hit hit = s.firstHit(ray, epsilon);
-                bestCorH.best(i.getE(), hit);
+                bestCorH.best(i.get(), hit);
             }
         }
 

@@ -20,7 +20,7 @@ public interface Wrap<T> extends Iterable<Solid> {
 
             @Override
             public MyItr<Body> iterator() {
-                return  new MyItr.MyBodyItr(col.iterator());
+                return MyItr.bodyItr(col.iterator());
             }
         };
     }
@@ -35,7 +35,7 @@ public interface Wrap<T> extends Iterable<Solid> {
 
             @Override
             public MyItr<Solid> iterator() {
-                return new MyItr.MySolidItr(col.iterator());
+                return MyItr.solidItr(col.iterator());
             }
         };
     }

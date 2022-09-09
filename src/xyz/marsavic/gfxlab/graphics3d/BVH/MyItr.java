@@ -5,60 +5,63 @@ import xyz.marsavic.gfxlab.graphics3d.Solid;
 
 import java.util.Iterator;
 
-public abstract class MyItr<T> implements Iterator<Solid> {
+public interface MyItr<T> extends Iterator<Solid> {
+    public T get();
 
-    private T e;
-    Iterator<T> it;
+    static MyItr<Body> bodyItr(Iterator<Body> iter){
+        return new MyItr<>() {
+            Iterator<Body> it= iter;
+            Body b;
+            @Override
+            public Body get() {
+                return b;
+            }
 
-    public MyItr(Iterator<T> it) {
-        this.it = it;
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public Solid next() {
+                Body b = it.next();
+                this.b = b;
+                return b.solid();
+            }
+
+            @Override
+            public void remove(){
+                it.remove();
+            }
+        };
     }
 
-    public T getE() {
-        return e;
-    }
+    static MyItr<Solid> solidItr(Iterator<Solid> iter) {
+        return new MyItr<>() {
+            private Iterator<Solid> it = iter;
+            private Solid s;
+            @Override
+            public Solid get() {
+                return s;
+            }
 
-    public void setE(T e) {
-        this.e = e;
-    }
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
 
-    @Override
-    public boolean hasNext() {
-        return it.hasNext();
-    }
+            @Override
+            public Solid next() {
+                Solid s = it.next();
+                this.s = s;
+                return s;
+            }
 
-    @Override
-    public void remove() {
-        it.remove();
-    }
-
-    static class MyBodyItr extends  MyItr<Body>{
-
-        public MyBodyItr(Iterator<Body> it) {
-            super(it);
-        }
-
-        @Override
-        public Solid next() {
-            Body b = it.next();
-            setE(b);
-            Solid s = b.solid();
-            return s;
-        }
-    }
-
-    static class MySolidItr extends  MyItr<Solid>{
-
-        public MySolidItr(Iterator<Solid> it) {
-            super(it);
-        }
-
-        @Override
-        public Solid next() {
-            Solid s = it.next();
-            setE(s);
-            return s;
-        }
+            @Override
+            public void remove(){
+                it.remove();
+            }
+        };
     }
 }
 
