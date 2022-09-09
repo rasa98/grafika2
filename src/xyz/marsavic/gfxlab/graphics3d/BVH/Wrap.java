@@ -5,36 +5,38 @@ import xyz.marsavic.gfxlab.graphics3d.Solid;
 
 import java.util.Collection;
 
-public abstract class Wrap<T> implements Iterable<Solid> {
-    Collection<T> col;
+public interface Wrap<T> extends Iterable<Solid> {
+    int getSize();
 
-    public Wrap(Collection<T> col){
-        this.col = col;
+    MyItr<T> iterator();
+
+    static Wrap<Body> bodyCollection(Collection<Body> col){
+        return new Wrap<>() {
+            private Collection<Body> c = col;
+            @Override
+            public int getSize() {
+                return c.size();
+            }
+
+            @Override
+            public MyItr<Body> iterator() {
+                return  new MyItr.MyBodyItr(col.iterator());
+            }
+        };
     }
 
-    public abstract MyItr<T> iterator();
+    static  Wrap<Solid> solidCollection(Collection<Solid> col) {
+        return new Wrap<>() {
+            private Collection<Solid> c =col;
+            @Override
+            public int getSize() {
+                return c.size();
+            }
 
-    static class BodyCol extends Wrap<Body> {
-
-        public BodyCol(Collection<Body> col) {
-            super(col);
-        }
-
-        @Override
-        public MyItr<Body> iterator() {
-            return new MyItr.MyBodyItr(col.iterator());
-        }
-    }
-
-    static class SolidCol extends Wrap<Solid> {
-
-        public SolidCol(Collection<Solid> col) {
-            super(col);
-        }
-
-        @Override
-        public MyItr<Solid> iterator() {
-            return new MyItr.MySolidItr(col.iterator());
-        }
+            @Override
+            public MyItr<Solid> iterator() {
+                return new MyItr.MySolidItr(col.iterator());
+            }
+        };
     }
 }

@@ -31,22 +31,22 @@ public class BVHFactory<T, S> {
     }
 
     public static BVHFactory<Body, Collision>.BVH makeBVHBody(Collection<Body> bodies, int amount) {
-        return new BVHFactory<>(bodies, Wrap.BodyCol::new, amount, BestColOrHit::bestCol).bvh;
+        return new BVHFactory<>(bodies, Wrap::bodyCollection, amount, BestColOrHit::bestCol).bvh;
     }
 
     public static BVHFactory<Solid, Hit>.BVH makeBVHSolid(Collection<Solid> bodies, int amount) {
-        return new BVHFactory<>(bodies, Wrap.SolidCol::new, amount, BestColOrHit::bestHit).bvh;
+        return new BVHFactory<>(bodies, Wrap::solidCollection, amount, BestColOrHit::bestHit).bvh;
     }
 
 
     public class BVH {
         private BoundingBox bbox;
-        private final Wrap<T> wraper;
+        private final Wrap<T> wrapper;
         private BVH left, right;
 
 
         private BVH(Collection<T> col) {
-            this.wraper = wrapperFactory.apply(col);
+            this.wrapper = wrapperFactory.apply(col);
             calculateBbox();
             divideBVH(amount);
         }
@@ -55,7 +55,7 @@ public class BVHFactory<T, S> {
         private void calculateBbox() {
             BoundingBox localBBox = new BoundingBox();
 
-            for (Solid s : wraper) {
+            for (Solid s : wrapper) {
                 localBBox = localBBox.addBBox(s.bbox());
             }
 
@@ -63,7 +63,7 @@ public class BVHFactory<T, S> {
         }
 
         private void divideBVH(int amount) {
-            if(wraper.col.size() < amount){
+            if(wrapper.getSize() < amount){
                 return;
             }
             BoundingBox leftHalf = bbox.getLeftHalf();
@@ -73,7 +73,7 @@ public class BVHFactory<T, S> {
 
             Set<T> inMid = new HashSet<>();
 
-            for(MyItr<T> i = wraper.iterator(); i.hasNext();) {
+            for(MyItr<T> i = wrapper.iterator(); i.hasNext();) {
                 Solid s = i.next();
                 T body = i.getE();
 
@@ -111,7 +111,7 @@ public class BVHFactory<T, S> {
         public S getColOrHit(Ray ray, double epsilon) {
             BestColOrHit<S, T> bestCorH = chFactory.get();
             if(bbox.rayHitsBox(ray, epsilon)){
-                getBestColOrHit(ray, epsilon, wraper, bestCorH);
+                getBestColOrHit(ray, epsilon, wrapper, bestCorH);
                 if(left != null){
                     S leftC = left.getColOrHit(ray, epsilon);
                     S rightC = right.getColOrHit(ray, epsilon);
@@ -133,7 +133,7 @@ public class BVHFactory<T, S> {
 
         public boolean getAnyColOrHit(Ray ray, double epsilon) {
             if(bbox.rayHitsBox(ray, epsilon)){
-                for (Solid s : wraper) {
+                for (Solid s : wrapper) {
                     Hit hit = s.firstHit(ray, epsilon);
                     if (hit != null)
                         return true;
