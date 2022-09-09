@@ -5,94 +5,96 @@ import xyz.marsavic.gfxlab.graphics3d.Collider.Collision;
 import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
 
-public abstract class BestColOrHit<COLorHIT, T>{
-    COLorHIT cORh;
+public interface BestColOrHit<COLorHIT, T>{
+    COLorHIT getCH();
 
-    BestColOrHit(COLorHIT cORh){ this.cORh = cORh; }
+    void best(COLorHIT cs1, COLorHIT cs2);
 
-    public abstract COLorHIT getCH();
+    void best(T b, Hit h);
 
-    abstract void best(COLorHIT cs1, COLorHIT cs2);
+    static BestColOrHit<Collision, Body> bestCol() {
+        return new BestColOrHit<>() {
+            private Collision c = Collision.EMPTY;
 
-    abstract void best(T b, Hit h);
+            @Override
+            public Collision getCH() {
+                if (c.body() == null)
+                    return null;
+                return c;
+            }
 
-    public static class BestCol extends BestColOrHit<Collision, Body>{
+            @Override
+            public void best(Collision c1, Collision c2) {
+                for (Collision c : new Collision[]{c1, c2}) {
+                    if (c == null)
+                        continue;
 
-        public BestCol() {
-            super(Collision.EMPTY);
-        }
+                    double t = c.hit().t();
 
-        @Override
-        public Collision getCH() {
-            if(cORh.body() == null)
-                return null;
-            return cORh;
-        }
-
-        @Override
-        void best(Collision c1, Collision c2) {
-            for(Collision c : new Collision[]{c1, c2}) {
-                if (c == null)
-                    continue;
-
-                double t = c.hit().t();
-
-                if (t > 0 && t < this.cORh.hit().t()) {
-                    this.cORh = c;
+                    if (t > 0 && t < this.c.hit().t()) {
+                        this.c = c;
+                    }
                 }
             }
-        }
 
-        @Override
-        void best(Body b, Hit h) {
-            if(h == null || b == null)
-                return;
+            @Override
+            public void best(Body b, Hit h) {
+                if (h == null || b == null)
+                    return;
 
-            double t = h.t();
+                double t = h.t();
 
-            if(t > 0 && t < this.cORh.hit().t()){
-                this.cORh = new Collision(h, (Body) b);
+                if (t > 0 && t < this.c.hit().t()) {
+                    this.c = new Collision(h, (Body) b);
+                }
             }
-        }
+        };
     }
 
-    public static class BestHit extends BestColOrHit<Hit, Solid>{
 
-        public BestHit() {
-            super(Hit.Data.tn(Double.MAX_VALUE, null));
-        }
+    static BestColOrHit<Hit, Solid> bestHit() {
+        return new BestColOrHit<>() {
+            private Hit h = Hit.Data.tn(Double.MAX_VALUE, null);
 
-        @Override
-        public Hit getCH() {
-            if(cORh.n() == null)
-                return null;
-            return cORh;
-        }
-
-        @Override
-        void best(Hit h1, Hit h2) {
-            for(Hit c : new Hit[]{h1, h2}) {
-                best(c);
+            @Override
+            public Hit getCH() {
+                if (h.n() == null)
+                    return null;
+                return h;
             }
-        }
 
-        @Override
-        void best(Solid s, Hit h) {
-            this.best(h);
-        }
-
-        private void best(Hit h) {
-            if (h == null)
-                return;
-
-            double t = h.t();
-
-            if (t > 0 && t < this.cORh.t()) {
-                this.cORh = h;
+            @Override
+            public void best(Hit h1, Hit h2) {
+                for (Hit h : new Hit[]{h1, h2}) {
+                    best(h);
+                }
             }
-        }
+
+            @Override
+            public void best(Solid b, Hit h) {
+                if (h == null)
+                    return;
+
+                double t = h.t();
+
+                if (t > 0 && t < this.h.t()) {
+                    this.h = h;
+                }
+            }
+
+            private void best(Hit h) {
+                if (h == null)
+                    return;
+
+                double t = h.t();
+
+                if (t > 0 && t < this.h.t()) {
+                    this.h = h;
+                }
+            }
+
+        };
     }
-
 }
 
 

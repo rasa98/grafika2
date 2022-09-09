@@ -31,11 +31,11 @@ public class BVHFactory<T, S> {
     }
 
     public static BVHFactory<Body, Collision>.BVH makeBVHBody(Collection<Body> bodies, int amount) {
-        return new BVHFactory<>(bodies, Wrap.BodyCol::new, amount, BestColOrHit.BestCol::new).bvh;
+        return new BVHFactory<>(bodies, Wrap.BodyCol::new, amount, BestColOrHit::bestCol).bvh;
     }
 
     public static BVHFactory<Solid, Hit>.BVH makeBVHSolid(Collection<Solid> bodies, int amount) {
-        return new BVHFactory<>(bodies, Wrap.SolidCol::new, amount, BestColOrHit.BestHit::new).bvh;
+        return new BVHFactory<>(bodies, Wrap.SolidCol::new, amount, BestColOrHit::bestHit).bvh;
     }
 
 
