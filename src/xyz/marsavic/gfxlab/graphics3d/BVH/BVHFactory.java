@@ -3,82 +3,148 @@ package xyz.marsavic.gfxlab.graphics3d.BVH;
 
 import xyz.marsavic.gfxlab.graphics3d.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+
 import static xyz.marsavic.gfxlab.graphics3d.Collider.Collision;
 
 
 public class BVHFactory {
 
-    private int amount;
-    private BVH bvh;
+    private final int amount;
 
-
-    private BVHFactory(Collection<Body> bodies, int amount) {
+    private BVHFactory(int amount) {
         this.amount = amount;
-        bvh = new BVH(bodies);
     }
 
-    public static BVH makeBVH(Collection<Body> bodies, int amount) {
-        return new BVHFactory(bodies, amount).bvh;
+    public static BodyBVH getBodyBVH(Collection<Body> bodies, int amount){
+        BVHFactory f = new BVHFactory(amount);
+        return f.body(bodies);
     }
 
-//    public Collision getCollision(Ray ray, double epsilon) {
-//        return bvh.getCollision(ray, epsilon);
-//    }
+    public static SolidBVH getSolidBVH(Collection<Solid> solids, int amount){
+        BVHFactory f = new BVHFactory(amount);
+        return f.solid(solids);
+    }
 
-    public class BVH {
-        private BoundingBox bbox;
-        private Collection<Body> bodies;
-        private BVH left, right;
+    public BodyBVH body(Collection<Body> bodies) {
+        return new BodyBVH(bodies);
+    }
+    public SolidBVH solid(Collection<Solid> solids) {
+        return new SolidBVH(solids);
+    }
 
+    public interface Itr<T> extends Iterator<Solid>{        ;
+        T get();
+    }
+    class BodyItr implements Itr<Body>{
+        Body b;
+        Iterator<Body> it;
 
-        private BVH(Collection<Body> bodies) {
-            this.bodies = bodies;
-            calculateBbox();
-            divideBVH(amount);
+        BodyItr(Iterator<Body> it){
+            this.it = it;
         }
 
+        @Override
+        public Body get() {
+            return b;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return it.hasNext();
+        }
+
+        @Override
+        public Solid next() {
+            Body b = it.next();
+            this.b = b;
+            return b.solid();
+        }
+
+        @Override
+        public void remove() {
+            it.remove();
+        }
+    }
+
+    class SolidItr implements Itr<Solid>{
+        Solid s;
+        Iterator<Solid> it;
+
+        SolidItr(Iterator<Solid> it){
+            this.it = it;
+        }
+
+        @Override
+        public Solid get() {
+            return s;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return it.hasNext();
+        }
+
+        @Override
+        public Solid next() {
+            s = it.next();
+            return s;
+        }
+
+        @Override
+        public void remove() {
+            it.remove();
+        }
+    }
+
+    public abstract class BVH<T, S> {
+        private BoundingBox bbox;
+        final Collection<T> bodies;
+        BVH<T, S> left, right;
+
+
+        private BVH(Collection<T> bodies) {
+            this.bodies = bodies;
+            calculateBbox();
+        }
+
+        protected abstract Itr<T> getIter();
 
         private void calculateBbox() {
             BoundingBox localBBox = new BoundingBox();
 
-            for(Iterator<Body> i = bodies.iterator(); i.hasNext();) {
-                Body body = i.next();
-                Solid s = body.solid();
+            for(Itr<T> i = getIter(); i.hasNext();) {
+                Solid s = i.next();
                 localBBox = localBBox.addBBox(s.bbox());
             }
 
             bbox = localBBox;
         }
 
-        private void divideBVH(int amount) {
+        private List<Set<T>> divideBVH() {
             if(bodies.size() < amount){
-                return;
+                return null;
             }
             BoundingBox leftHalf = bbox.getLeftHalf();
 
-            Set<Body> leftBodies = new HashSet<>();
-            Set<Body> rightBodies = new HashSet<>();
+            Set<T> leftBodies = new HashSet<>();
+            Set<T> rightBodies = new HashSet<>();
 
-            Set<Body> inMid = new HashSet<>();
+            Set<T> inMid = new HashSet<>();
 
-            for(Iterator<Body> i = bodies.iterator(); i.hasNext();) {
-                Body body = i.next();
-                Solid s = body.solid();
+            for(Itr<T> i = getIter(); i.hasNext();) {
+                Solid s = i.next();
                 BoundingBox.hasBBox e = leftHalf.hasBBox(s.bbox());
 
                 switch (e){
                     case FULL:
-                        leftBodies.add(body);
+                        leftBodies.add(i.get());
                         break;
                     case NONE:
-                        rightBodies.add(body);
+                        rightBodies.add(i.get());
                         break;
                     case HALF:
-                        inMid.add(body);
+                        inMid.add(i.get());
                         break;
                     default: // outlier
                         continue;
@@ -86,7 +152,7 @@ public class BVHFactory {
 
                 i.remove();
             }
-            for(Body b: inMid){
+            for(T b: inMid){
                 if(leftBodies.size() >= rightBodies.size()){
                     rightBodies.add(b);
                 }
@@ -94,76 +160,140 @@ public class BVHFactory {
                     leftBodies.add(b);
                 }
             }
-
-
-            left = new BVH(leftBodies);
-            right = new BVH(rightBodies);
+            List<Set<T>> l = new ArrayList<>();
+            l.add(leftBodies);l.add(rightBodies);
+            return l;
         }
 
-        private class BestCol{
-            Collision c;
 
-            BestCol(){ this.c = Collision.empty();}
-
-            BestCol(Collision c){ this.c = c; }
-
-            void best(Collision... cs){
-                for(Collision c : cs) {
-                    if (c == null)
-                        continue;
-
-                    double t = c.hit().t();
-
-                    if (t > 0 && t < this.c.hit().t()) {
-                        this.c = c;
-                    }
-                }
-            }
-
-            void best(Body b, Hit h){
-                if(h == null || b == null)
-                    return;
-
-                double t = h.t();
-
-                if(t > 0 && t < this.c.hit().t()){
-                    this.c = new Collision(h, b);
-                }
-            }
-        }
-
-        public Collision getCollision(Ray ray, double epsilon) {
-            BestCol minC = new BestCol();
+        public S getCollision(Ray ray, double epsilon) {
+            S s = null;
             if(bbox.rayHitsBox(ray, epsilon)){
-                getBestCollision(ray, epsilon, bodies, minC);
+                s = getBestCollision(ray, epsilon);
                 if(left != null){
-                    Collision leftC = left.getCollision(ray, epsilon);
-                    Collision rightC = right.getCollision(ray, epsilon);
+                    S leftS = left.getCollision(ray, epsilon);
+                    S rightS = right.getCollision(ray, epsilon);
 
-                    minC.best(leftC, rightC);
+                    s = min(s, leftS, rightS);
                 }
             }
-            return minC.c;
+            return s;
         }
 
-        private void getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, BestCol minC){
-            for(Body body: bodies) {
-                Solid s = body.solid();
-                Hit hit = s.firstHit(ray, epsilon);
-                minC.best(body, hit);
-            }
-        }
+        abstract S min(S s1, S s2, S s3);
 
-
-//        public Collision getBestCollision(Ray ray, double epsilon, Collection<Body> bodies, Collision minC){
-//            BestCol bestC = new BestCol(minC);
-//            getBestCollision(ray, epsilon, bodies, bestC);
-//            return bestC.c;
-//        }
+        abstract S getBestCollision(Ray ray, double epsilon);
 
 
         public boolean getCollisionIn01(Ray r, double epsilon) {
             throw new RuntimeException("Method getCollisionIn01 in BVH class not implemented!!!");
+        }
+    }
+
+    class BodyBVH extends BVH<Body, Collision> {
+
+        private BodyBVH(Collection<Body> bodies) {
+            super(bodies);
+            repeatDivide();
+        }
+
+        @Override
+        protected Itr<Body> getIter() {
+            return new BodyItr(bodies.iterator());
+        }
+
+
+        private void repeatDivide(){
+            List<Set<Body>> l = super.divideBVH();
+            if(l != null){
+                left = new BodyBVH(l.get(0));
+                right = new BodyBVH(l.get(1));
+            }
+        }
+
+        @Override
+        Collision min(Collision c1, Collision c2, Collision c3) {
+            Collision col = Collision.EMPTY;
+            for(Collision c : new Collision[]{c1, c2, c3}) {
+                if (c != null) {
+                    double t = c.hit().t();
+
+                    if (t > 0 && t < col.hit().t()) {
+                        col = c;
+                    }
+                }
+            }
+            return col.body() == null ? null: col;
+        }
+
+        @Override
+        Collision getBestCollision(Ray ray, double epsilon) {
+            Collision min = Collision.EMPTY;
+            for(Itr<Body> i = getIter(); i.hasNext();) {
+                Solid s = i.next();
+                Hit hit = s.firstHit(ray, epsilon);
+                min = min(i.get(), hit, min);
+            }
+            return min;
+        }
+
+        Collision min(Body b, Hit h, Collision c) {
+            if(h != null && b != null){
+                double t = h.t();
+
+                if(t > 0 && t < c.hit().t()){
+                    return new Collision(h, b);
+                }
+            }
+            return c;
+        }
+    }
+
+    class SolidBVH extends BVH<Solid, Hit> {
+
+        private SolidBVH(Collection<Solid> bodies) {
+            super(bodies);
+            repeatDivide();
+        }
+
+        @Override
+        protected Itr<Solid> getIter() {
+            return new SolidItr(bodies.iterator());
+        }
+
+
+        private void repeatDivide(){
+            List<Set<Solid>> l = super.divideBVH();
+            if(l != null){
+                left = new SolidBVH(l.get(0));
+                right = new SolidBVH(l.get(1));
+            }
+        }
+
+        @Override
+        Hit min(Hit h1, Hit h2, Hit h3) {
+            Hit hit = new Hit.Data(Double.MAX_VALUE, null);
+            for(Hit c : new Hit[]{h1, h2, h3}) {
+                if (c != null) {
+                    double t = c.t();
+
+                    if (t > 0 && t < hit.t()) {
+                        hit = c;
+                    }
+                }
+            }
+            return hit.n() == null ? null: hit;
+        }
+
+        @Override
+        Hit getBestCollision(Ray ray, double epsilon) {
+            Hit min = null;
+            for(Itr<Solid> i = getIter(); i.hasNext();) {
+                Solid s = i.next();
+                Hit hit = s.firstHit(ray, epsilon);
+                min = min(hit, min, null);
+            }
+            return min;
         }
     }
 }

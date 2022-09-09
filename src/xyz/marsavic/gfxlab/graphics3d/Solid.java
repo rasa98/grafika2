@@ -1,6 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d;
 
 import xyz.marsavic.gfxlab.Vec3;
+import xyz.marsavic.gfxlab.graphics3d.BVH.BVHFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -92,12 +93,12 @@ public abstract class Solid {
 
     abstract static class CsgSolid extends Solid {
 
-        private BVHSolid bvh = BVHSolid.makeBVH(new HashSet<>(Arrays.asList(children())), 3);
+        private BVHFactory.BVH<Solid, Hit> bvh = BVHFactory.getSolidBVH(new HashSet<>(Arrays.asList(children())), 3);
 
         abstract Solid[] children();
 
         public Boolean ifBoxHit(Ray ray, double afterTime){
-            return bvh.getHit(ray, afterTime) != null;
+            return bvh.getCollision(ray, afterTime) != null;
         }
 
 		@Override
