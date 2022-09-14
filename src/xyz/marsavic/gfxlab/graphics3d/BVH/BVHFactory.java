@@ -109,6 +109,10 @@ public class BVHFactory<T, S> {
         }
 
         public S getColOrHit(Ray ray, double epsilon) {
+            return getColOrHitPrivate(ray, epsilon).getCH();
+        }
+
+        private BestColOrHit<S, T> getColOrHitPrivate(Ray ray, double epsilon){
             BestColOrHit<S, T> bestCorH = chFactory.get();
             getBestColOrHit(ray, epsilon, wrapper, bestCorH); // from body/solids in this bvh level (if any)
             if(left != null){
@@ -118,25 +122,32 @@ public class BVHFactory<T, S> {
                 BestColOrHit<Hit, Solid> minHit = BestColOrHit.bestHit();
                 minHit.best(h1, h2);
 
+                Hit earlierHit = minHit.getCH();
+                Hit laterHit;
                 if(minHit.getCH() != null){ // if ray hit any of child (h1 or h2)
-                    S leftC = null;
-                    S rightC = null;
+                    BestColOrHit<S, T> fromBetterChild;
+                    BestColOrHit<S, T> fromWorseChild;
 
-                    if(minHit.getCH() == h1){
-                        leftC = left.getColOrHit(ray, epsilon);
-                        if(leftC == null){
-                            rightC = right.getColOrHit(ray, epsilon);
-                        }
+                    BVH first , second;
+                    if(earlierHit == h1){
+                        first = left; second = right;
+                        laterHit = h2;
                     }else{
-                        rightC = right.getColOrHit(ray, epsilon);
-                        if (rightC == null){
-                            leftC = left.getColOrHit(ray, epsilon);
-                        }
+                        first = right; second = left;
+                        laterHit = h1;
                     }
-                    bestCorH.best(leftC, rightC);
+
+                    fromBetterChild = first.getColOrHitPrivate(ray, epsilon);
+
+                    if(fromBetterChild.getCH() == null || (laterHit != null && fromBetterChild.time() > laterHit.t())){
+                        fromWorseChild = second.getColOrHitPrivate(ray, epsilon);
+                    }else{
+                        fromWorseChild = chFactory.get();
+                    }
+                    bestCorH.best(fromBetterChild.getCH(), fromWorseChild.getCH());
                 }
             }
-            return bestCorH.getCH();
+            return bestCorH;
         }
 
         private void getBestColOrHit(Ray ray, double epsilon, Wrap<T> wrapper, BestColOrHit<S, T> bestCorH){

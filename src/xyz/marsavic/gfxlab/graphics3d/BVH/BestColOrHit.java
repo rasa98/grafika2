@@ -12,6 +12,8 @@ public interface BestColOrHit<COLorHIT, T>{
 
     void best(T b, Hit h);
 
+    double time();
+
     static BestColOrHit<Collision, Body> bestCol() {
         return new BestColOrHit<>() {
             private Collision c = Collision.EMPTY;
@@ -48,6 +50,11 @@ public interface BestColOrHit<COLorHIT, T>{
                     this.c = new Collision(h, (Body) b);
                 }
             }
+
+            @Override
+            public double time() {
+                return c.hit().t();
+            }
         };
     }
 
@@ -80,6 +87,11 @@ public interface BestColOrHit<COLorHIT, T>{
                 if (t > 0 && t < this.h.t()) {
                     this.h = h;
                 }
+            }
+
+            @Override
+            public double time() {
+                return h.t();
             }
 
             private void best(Hit h) {
