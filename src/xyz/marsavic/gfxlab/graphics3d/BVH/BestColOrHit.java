@@ -66,7 +66,7 @@ public interface BestColOrHit<COLorHIT, T>{
             @Override
             public void best(Hit h1, Hit h2) {
                 for (Hit h : new Hit[]{h1, h2}) {
-                    best(h);
+                   best(h);
                 }
             }
 
@@ -92,7 +92,6 @@ public interface BestColOrHit<COLorHIT, T>{
                     this.h = h;
                 }
             }
-
         };
     }
 }

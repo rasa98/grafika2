@@ -86,8 +86,8 @@ public class BoundingBox {
         return hasBBox.NONE;
     }
 
-    public boolean rayHitsBox(Ray ray, double afterTime){
-        return box.firstHit(ray, afterTime) != null;
+    public Hit rayHitsBox(Ray ray, double afterTime){
+        return box.firstHit(ray, afterTime);
     }
 
     public BoundingBox getLeftHalf(){

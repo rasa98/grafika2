@@ -112,7 +112,7 @@ public class BVHSolid {
 
     public Hit getHit(Ray ray, double epsilon) {
         Hit minH = null;
-        if(bbox.rayHitsBox(ray, epsilon)){
+        if(bbox.rayHitsBox(ray, epsilon) != null){
             double minT = Double.MAX_VALUE;
 
             for(Solid s: solids) {

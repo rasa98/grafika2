@@ -110,12 +110,29 @@ public class BVHFactory<T, S> {
 
         public S getColOrHit(Ray ray, double epsilon) {
             BestColOrHit<S, T> bestCorH = chFactory.get();
-            if(bbox.rayHitsBox(ray, epsilon)){
-                getBestColOrHit(ray, epsilon, wrapper, bestCorH);
-                if(left != null){
-                    S leftC = left.getColOrHit(ray, epsilon);
-                    S rightC = right.getColOrHit(ray, epsilon);
+            getBestColOrHit(ray, epsilon, wrapper, bestCorH); // from body/solids in this bvh level (if any)
+            if(left != null){
+                Hit h1 = left.bbox.rayHitsBox(ray, epsilon);
+                Hit h2 = right.bbox.rayHitsBox(ray, epsilon);
 
+                BestColOrHit<Hit, Solid> minHit = BestColOrHit.bestHit();
+                minHit.best(h1, h2);
+
+                if(minHit.getCH() != null){ // if ray hit any of child (h1 or h2)
+                    S leftC = null;
+                    S rightC = null;
+
+                    if(minHit.getCH() == h1){
+                        leftC = left.getColOrHit(ray, epsilon);
+                        if(leftC == null){
+                            rightC = right.getColOrHit(ray, epsilon);
+                        }
+                    }else{
+                        rightC = right.getColOrHit(ray, epsilon);
+                        if (rightC == null){
+                            leftC = left.getColOrHit(ray, epsilon);
+                        }
+                    }
                     bestCorH.best(leftC, rightC);
                 }
             }
@@ -132,7 +149,7 @@ public class BVHFactory<T, S> {
 
 
         public boolean getAnyColOrHit(Ray ray, double epsilon) {
-            if(bbox.rayHitsBox(ray, epsilon)){
+            if(bbox.rayHitsBox(ray, epsilon) != null){
                 for (Solid s : wrapper) {
                     Hit hit = s.firstHit(ray, epsilon);
                     if (hit != null)
