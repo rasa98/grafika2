@@ -124,7 +124,7 @@ public class BVHFactory<T, S> {
 
                 Hit earlierHit = minHit.getCH();
                 Hit laterHit;
-                if(minHit.getCH() != null){ // if ray hit any of child (h1 or h2)
+                if(earlierHit != null){ // if ray hit any of child (h1 or h2)
                     BestColOrHit<S, T> fromBetterChild;
                     BestColOrHit<S, T> fromWorseChild;
 

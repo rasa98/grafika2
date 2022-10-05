@@ -30,7 +30,7 @@ public class GfxLab {
 	@GadgetDoubleExponential(p = 0x1p-4, q = 0x1p+4)
 	public double power = 1.0;
 	
-	@GadgetDouble(p = -0.05, q = 0.05)
+	@GadgetDouble(p = -0.25, q = 0.25)
 	public double phi = 0;
 	
 	@GadgetDouble(p = 0, q = 0.5)
@@ -54,6 +54,9 @@ public class GfxLab {
 	@GadgetDouble(p = -1, q = 1)
 	public double rotZ = 0;
 
+	@GadgetDouble(p = -6, q = 3)
+	public double Z = 0;
+
 //	@Gadget
 //	public Boolean topLight = False;
 	
@@ -75,12 +78,14 @@ public class GfxLab {
 //				new UnionRoom();
 //				new cubeRandomRoom();
 				new CombineAllRoom(rotX, rotY, rotZ);
+//				new teapotLowRes(Z);
 
 		camera = new TransformedCamera(
 				Perspective.fov(fovAngle),
 				Affine.IDENTITY
-						.andThen(Affine.translation(Vec3.xyz(0, 0, -3)))
 						.andThen(Affine.rotationAboutY(phi))
+						.andThen(Affine.translation(Vec3.xyz(0, 0, -3)))
+
 		);
 		
 //		rayTracer = new RayTracerSimple(

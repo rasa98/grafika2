@@ -41,6 +41,8 @@ public class Triangle extends Solid {
 	}
 	@Override
 	public HitTriangle firstHit(Ray ray, double afterTime) {
+		if(ray.d().dot(n) > 0) // Sa unutrasnje strane trougla smo, n normala koju racunam iz temena
+			return null;
 		Vec3 dir_cross_e2 = ray.d().cross(e2);
 		double det = e1.dot(dir_cross_e2);
 		if(Math.abs(det) < EPSILON)
